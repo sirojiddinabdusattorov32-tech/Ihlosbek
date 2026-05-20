@@ -1,6 +1,7 @@
 import random
 import base64
 import json
+import os
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
@@ -10,6 +11,7 @@ from django.utils import timezone
 from django.db.models import Q, Count, Prefetch
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.conf import settings
 from django.core.cache import cache
@@ -839,15 +841,10 @@ def react_message(request, msg_id):
         msg.reaction = emoji
         msg.save()
     return JsonResponse({'reaction': msg.reaction})
-
-
-import os
-from django.http import FileResponse
-
 def download_apk(request):
     file_path = os.path.join(settings.BASE_DIR, 'downloads', 'avtosotuv-v1.0.0.apk')
     if not os.path.exists(file_path):
-        from django.http import HttpResponseNotFound
+        from django.http import HttpResponse, HttpResponseNotFound, FileResponse
         return HttpResponseNotFound("Fayl topilmadi")
 
     file_size = os.path.getsize(file_path)
@@ -872,3 +869,17 @@ def download_history_view(request):
         return redirect('login')
     downloads = DownloadHistory.objects.filter(user=request.user)[:50]
     return render(request, 'download_history.html', {'downloads': downloads})
+
+
+def service_worker(request):
+    file_path = os.path.join(settings.BASE_DIR, 'static', 'service-worker.js')
+    with open(file_path, 'r') as f:
+        content = f.read()
+    return HttpResponse(content, content_type='application/javascript')
+
+
+def manifest_json(request):
+    file_path = os.path.join(settings.BASE_DIR, 'static', 'manifest.json')
+    with open(file_path, 'r') as f:
+        content = f.read()
+    return HttpResponse(content, content_type='application/manifest+json')

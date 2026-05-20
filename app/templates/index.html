@@ -11,6 +11,11 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12.1.4/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Avtosotuv">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
 
 </head>
 <style>
@@ -126,6 +131,12 @@
 {% block loading %}
     {% include 'partials/loading.html' %}
 {% endblock %}
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js', {scope: '/'});
+}
+</script>
 
 {% block content %}
 
