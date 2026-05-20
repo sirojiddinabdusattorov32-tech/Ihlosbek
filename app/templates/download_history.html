@@ -1,0 +1,44 @@
+{% extends 'index.html' %}
+{% block title %}Yuklab olishlar tarixi{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Yuklab olishlar tarixi</h1>
+        <a href="{% url 'home' %}" class="text-sm text-blue-600 hover:text-blue-800">&larr; Ortga</a>
+    </div>
+
+    {% if downloads %}
+        <div class="space-y-3">
+            {% for d in downloads %}
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-gray-900 truncate">{{ d.file_name }}</p>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                            <span>{{ d.file_size }}</span>
+                            <span>{{ d.platform|title }}</span>
+                            <span>{{ d.downloaded_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'download_apk' %}" class="text-sm font-medium text-blue-600 hover:text-blue-800 shrink-0">Qayta yuklash</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-16">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">Hech narsa yuklanmagan</h3>
+            <p class="text-sm text-gray-500 mb-4">Ilova hali yuklab olinmagan. Pastdagi tugma orqali yuklab oling.</p>
+            <a href="{% url 'download_apk' %}" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Yuklab olish
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

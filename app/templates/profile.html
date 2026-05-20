@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile_user.username }} - Profil</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-around; padding: 6px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
+        .bottom-nav a, .bottom-nav button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #6b7280; text-decoration: none; background: none; border: none; cursor: pointer; padding: 4px 12px; transition: color 0.15s; }
+        .bottom-nav a:hover, .bottom-nav button:hover { color: #1565C0; }
+        .bottom-nav a.active, .bottom-nav button.active { color: #1565C0; }
+        .bottom-nav .icon { font-size: 22px; line-height: 1; }
+        body { padding-bottom: 60px; }
+        @media (min-width: 768px) { .bottom-nav { display: none; } body { padding-bottom: 0; } }
+        @media (max-width: 768px) {
+          .username-text { display: none; }
+          .profile-search-input { display: none; }
+          .btn-add-product { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen" style="font-family: 'Manrope', sans-serif;">
+
+{% include 'partials/navbar.html' %}
+
+<div class="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-8 text-center">
+        {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" class="avatar w-28 h-28 rounded-full object-cover mx-auto border-4 border-blue-100 shadow-md" data-username="{{ profile_user.username }}">
+        {% else %}
+            <div class="avatar-letter w-28 h-28 rounded-full bg-blue-100 mx-auto border-4 border-blue-100 shadow-md flex items-center justify-center text-blue-600 text-4xl font-bold" data-username="{{ profile_user.username }}">{{ profile_user.username|first|upper }}</div>
+        {% endif %}
+
+        <h1 class="text-2xl font-bold text-gray-900 mt-4">{{ profile_user.first_name|default:profile_user.username }}</h1>
+        <p class="text-gray-500 text-sm">@{{ profile_user.username }} | {{ profile.phone }}</p>
+        {% if profile.region %}
+            <p class="text-gray-400 text-xs mt-1">
+                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                {{ profile.get_region_display }}
+            </p>
+        {% endif %}
+
+        <div class="flex justify-center gap-8 mt-6">
+            <a href="{% url 'subscribers' profile_user.username %}" class="text-center hover:text-blue-600">
+                <div class="text-2xl font-bold text-gray-900">{{ sub_count }}</div>
+                <div class="text-sm text-gray-500">Obunachilar</div>
+            </a>
+            <a href="{% url 'following' profile_user.username %}" class="text-center hover:text-blue-600">
+                <div class="text-2xl font-bold text-gray-900">{{ following_count }}</div>
+                <div class="text-sm text-gray-500">Obunalar</div>
+            </a>
+        </div>
+
+        {% if user.is_authenticated %}
+            {% if user == profile_user %}
+                <div class="flex justify-center gap-3 mt-6 flex-wrap">
+                    <a href="{% url 'profile_edit' %}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition"><i class="fa-solid fa-pencil"></i> Profilni tahrirlash</a>
+                    <a href="/home/?open_camera=1" class="px-6 py-3 bg-gradient-to-r from-yellow-400 to-pink-500 text-white rounded-xl text-sm font-bold transition hover:opacity-90 inline-block">Story qo'shish</a>
+                    <a href="{% url 'logout' %}" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-bold transition">Chiqish</a>
+                </div>
+            {% else %}
+                <div class="flex justify-center gap-3 mt-6">
+                    <form method="post" action="{% url 'subscribe' profile_user.username %}">
+                        {% csrf_token %}
+                        <button type="submit" class="px-6 py-3 rounded-xl text-sm font-bold transition {% if is_subscribed %}bg-gray-200 text-gray-700 hover:bg-gray-300{% else %}bg-blue-600 text-white hover:bg-blue-700{% endif %}">
+                            {% if is_subscribed %}Obunani bekor qilish{% else %}Obuna bo'lish{% endif %}
+                        </button>
+                    </form>
+                    <a href="{% url 'chat' profile_user.username %}" class="px-6 py-3 rounded-xl text-sm font-bold bg-green-500 hover:bg-green-600 text-white transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        SMS yozish
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- USER PRODUCTS -->
+    {% if products %}
+    <div class="mt-8">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Mahsulotlar</h2>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {% for p in products %}
+            <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition">
+                <a href="{% url 'chat' profile_user.username %}">
+                    <img src="{{ p.image.url }}" class="w-full aspect-square object-cover" alt="{{ p.name }}">
+                </a>
+                <div class="p-3">
+                    <a href="{% url 'chat' profile_user.username %}" class="font-semibold text-sm text-gray-900">🚗 {{ p.car_model|default:p.name }}</a>
+                    <div class="text-sm mt-1">
+                        {% if p.price %}<span class="font-bold text-blue-600">{{ p.price }}</span>{% endif %}
+                        {% if p.price and p.mileage %}<span class="text-gray-400 mx-1">|</span>{% endif %}
+                        {% if p.mileage %}<span class="text-xs text-gray-500">⏱ {{ p.mileage }}</span>{% endif %}
+                    </div>
+                    {% if p.color %}<div class="text-xs text-gray-500 mt-1">🎨 Kraska: {{ p.color }}</div>{% endif %}
+                    <div class="text-xs text-gray-500 mt-1">📞 {{ profile.phone }}</div>
+                    {% if profile.region %}<div class="text-xs text-gray-500">📍 {{ profile.get_region_display }}</div>{% endif %}
+                    {% if p.description %}
+                    <div class="text-xs text-gray-500 mt-1">{{ p.description }}</div>
+                    {% endif %}
+                    {% if user == profile_user %}
+                    <div class="flex gap-2 mt-2">
+                        <a href="{% url 'product_edit' p.id %}" class="flex-1 text-center px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-800 rounded-lg text-xs font-semibold transition">Tahrirlash</a>
+                        <button onclick="deleteProduct({{ p.id }}, this)" class="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition">O'chirish</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if admin_products %}
+    <div class="mt-8">
+        <h2 class="text-lg font-bold text-blue-600 mb-4">Admin mahsulotlari</h2>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {% for p in admin_products %}
+            <a href="{% url 'chat' p.user.username %}" class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition block text-left">
+                <img src="{{ p.image.url }}" class="w-full aspect-square object-cover" alt="{{ p.name }}">
+                <div class="p-3">
+                    <div class="font-semibold text-sm text-gray-900">🚗 {{ p.car_model|default:p.name }}</div>
+                    <div class="text-sm mt-1">
+                        {% if p.price %}<span class="font-bold text-blue-600">{{ p.price }}</span>{% endif %}
+                        {% if p.price and p.mileage %}<span class="text-gray-400 mx-1">|</span>{% endif %}
+                        {% if p.mileage %}<span class="text-xs text-gray-500">⏱ {{ p.mileage }}</span>{% endif %}
+                    </div>
+                    {% if p.color %}<div class="text-xs text-gray-500 mt-1">🎨 Kraska: {{ p.color }}</div>{% endif %}
+                    <div class="text-xs text-gray-500 mt-1">👤 {{ p.user.username }}</div>
+                    <div class="text-xs text-gray-500">📞 {{ p.user.profile.phone|default:'' }}</div>
+                    {% if p.user.profile.region %}<div class="text-xs text-gray-500">📍 {{ p.user.profile.get_region_display }}</div>{% endif %}
+                    {% if p.description %}
+                    <div class="text-xs text-gray-500 mt-1">{{ p.description }}</div>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+function getCSRFToken() {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var c = cookies[i].trim();
+        if (c.startsWith('csrftoken=')) return c.substring(10);
+    }
+    return '';
+}
+function deleteProduct(id, btn) {
+    if (!confirm("Rostdan ham o'chirmoqchimisiz?")) return;
+    fetch('/product/delete/' + id + '/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.ok) {
+                var card = btn.closest('.bg-white');
+                if (card) card.remove();
+            } else {
+                alert("Xatolik yuz berdi!");
+            }
+        });
+}
+</script>
+
+{% include 'partials/futer.html' %}
+{% include 'partials/story_viewer_global.html' %}
+</body>
+</html>

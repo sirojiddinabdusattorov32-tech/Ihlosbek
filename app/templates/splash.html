@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>avtosotuv.uz</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+        }
+        body {
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            padding: 16px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .welcome-text h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1565C0;
+            margin-bottom: 6px;
+        }
+        .welcome-text p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .wrap {
+            background: #0d2680;
+            border-radius: 22px;
+            border: 1.5px solid #1e3fae;
+            padding: 40px 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            min-height: 220px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            max-width: 100%;
+        }
+
+        .car-zone {
+            position: relative;
+            width: 210px;
+            height: 148px;
+            flex-shrink: 0;
+        }
+
+        canvas#lc {
+            position: absolute;
+            top: 0; left: 0;
+            width: 210px; height: 148px;
+            pointer-events: none;
+        }
+
+        svg#cs {
+            position: absolute;
+            top: 0; left: 0;
+            overflow: visible;
+        }
+
+        .right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .brand {
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 54px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            letter-spacing: -2px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(24px);
+        }
+
+        .brand span { color: #5bbfee; }
+
+        .tagline {
+            font-size: 12.5px;
+            letter-spacing: 5px;
+            color: #7dd3fc;
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        .uline {
+            height: 2px;
+            border-radius: 2px;
+            background: #3b82f6;
+            width: 0;
+            margin-top: 2px;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 9px; right: 14px;
+            font-size: 11px;
+            color: #3b82f6;
+            opacity: 0.55;
+        }
+
+        @media (max-width: 640px) {
+            .welcome-text h1 { font-size: 20px; }
+            .welcome-text p { font-size: 12px; }
+            .wrap {
+                padding: 20px 16px;
+                gap: 12px;
+                min-height: auto;
+                border-radius: 16px;
+                flex-direction: column;
+            }
+            .car-zone {
+                width: 168px;
+                height: 118px;
+                transform: scale(0.8);
+                transform-origin: center;
+            }
+            canvas#lc { width: 168px; height: 118px; }
+            svg#cs { width: 168px; height: 118px; }
+            .brand { font-size: 32px; letter-spacing: -1px; }
+            .tagline { font-size: 10px; letter-spacing: 3px; }
+            .right { align-items: center; }
+        }
+
+        @media (max-width: 400px) {
+            .welcome-text h1 { font-size: 17px; }
+            .welcome-text p { font-size: 11px; }
+            .wrap {
+                padding: 16px 12px;
+                gap: 8px;
+                border-radius: 14px;
+            }
+            .car-zone {
+                width: 140px;
+                height: 98px;
+                transform: scale(0.7);
+            }
+            canvas#lc { width: 140px; height: 98px; }
+            svg#cs { width: 140px; height: 98px; }
+            .brand { font-size: 26px; letter-spacing: -1px; }
+            .tagline { font-size: 8px; letter-spacing: 2px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="welcome-text">
+    <h1>Avto sotuvga hush kelibsiz!</h1>
+    <p>Sizni eng yaxshi avtomobillar dunyosi kutmoqda...</p>
+</div>
+
+<div class="wrap" id="wrap">
+  <div class="car-zone">
+    <canvas id="lc" width="210" height="148"></canvas>
+    <svg id="cs" width="210" height="148" viewBox="0 0 210 148">
+      <g id="cg">
+        <ellipse cx="105" cy="138" rx="76" ry="7" fill="#08174f" opacity="0.6"/>
+        <rect x="16" y="76" width="178" height="52" rx="11" fill="#1b3fad"/>
+        <path d="M46 76 L68 36 L142 36 L164 76 Z" fill="#1b3fad"/>
+        <path d="M72 40 L86 40 L78 72 L64 72 Z" fill="#2a52c9" opacity="0.45"/>
+        <path d="M140 72 L156 72 L144 42 L124 42 Z" fill="#5ab4d6" opacity="0.5"/>
+        <path d="M54 72 L70 72 L82 42 L70 42 Z" fill="#5ab4d6" opacity="0.42"/>
+        <rect x="86" y="42" width="34" height="30" rx="3" fill="#5ab4d6" opacity="0.38"/>
+        <line x1="16" y1="92" x2="194" y2="92" stroke="#1330a0" stroke-width="1.5"/>
+        <line x1="108" y1="76" x2="108" y2="126" stroke="#1330a0" stroke-width="1.5"/>
+        <rect x="120" y="94" width="18" height="5" rx="2.5" fill="#2a52c9"/>
+        <rect x="66" y="94" width="18" height="5" rx="2.5" fill="#2a52c9"/>
+        <rect x="170" y="102" width="24" height="16" rx="6" fill="#1330a0"/>
+        <ellipse cx="185" cy="87" rx="11" ry="7" fill="#c7e9fc" id="hl" opacity="0"/>
+        <ellipse cx="185" cy="87" rx="16" ry="11" fill="none" stroke="#c7e9fc" stroke-width="1" id="hlg" opacity="0"/>
+        <ellipse cx="24" cy="87" rx="9" ry="6" fill="#60a5fa" opacity="0.8"/>
+        <rect x="16" y="102" width="22" height="16" rx="6" fill="#1330a0"/>
+        <circle cx="54" cy="128" r="21" fill="#0b1b5e"/>
+        <circle cx="54" cy="128" r="14" fill="#1535a0"/>
+        <circle cx="54" cy="128" r="8" fill="#0b1b5e"/>
+        <circle cx="54" cy="128" r="4" fill="#4a7fe8" opacity="0.8"/>
+        <line id="ra" x1="54" y1="114" x2="54" y2="142" stroke="#5b8fee" stroke-width="1.5" opacity="0.7"/>
+        <line id="rb" x1="40" y1="128" x2="68"  y2="128" stroke="#5b8fee" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="154" cy="128" r="21" fill="#0b1b5e"/>
+        <circle cx="154" cy="128" r="14" fill="#1535a0"/>
+        <circle cx="154" cy="128" r="8" fill="#0b1b5e"/>
+        <circle cx="154" cy="128" r="4" fill="#4a7fe8" opacity="0.8"/>
+        <line id="fa" x1="154" y1="114" x2="154" y2="142" stroke="#5b8fee" stroke-width="1.5" opacity="0.7"/>
+        <line id="fb" x1="140" y1="128" x2="168" y2="128" stroke="#5b8fee" stroke-width="1.5" opacity="0.7"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="right">
+    <div class="brand" id="brand">avtosotuv<span>.uz</span></div>
+    <div class="tagline" id="tagline">AVTOMOBIL BOZORI</div>
+    <div class="uline" id="uline"></div>
+  </div>
+
+  <div class="hint">bosing — qayta</div>
+</div>
+
+<script>
+  const wrap    = document.getElementById('wrap');
+  const cg      = document.getElementById('cg');
+  const brand   = document.getElementById('brand');
+  const tagline = document.getElementById('tagline');
+  const uline   = document.getElementById('uline');
+  const hl      = document.getElementById('hl');
+  const hlg     = document.getElementById('hlg');
+  const lc      = document.getElementById('lc');
+  const ctx     = lc.getContext('2d');
+  const ra = document.getElementById('ra'), rb = document.getElementById('rb');
+  const fa = document.getElementById('fa'), fb = document.getElementById('fb');
+
+  let raf, t = 0, running = false, wa = 0, redirectTimer = null;
+
+  const sLines = Array.from({ length: 12 }, () => ({
+    y:   52 + Math.random() * 90,
+    x:   80 + Math.random() * 60,
+    len: 18 + Math.random() * 32,
+    spd: 3.5 + Math.random() * 4,
+    op:  0.12 + Math.random() * 0.22
+  }));
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function setSpoke(a, b, cx, cy, angle, r) {
+    a.setAttribute('x1', cx + Math.cos(angle) * r);
+    a.setAttribute('y1', cy + Math.sin(angle) * r);
+    a.setAttribute('x2', cx - Math.cos(angle) * r);
+    a.setAttribute('y2', cy - Math.sin(angle) * r);
+    b.setAttribute('x1', cx + Math.cos(angle + Math.PI / 2) * r);
+    b.setAttribute('y1', cy + Math.sin(angle + Math.PI / 2) * r);
+    b.setAttribute('x2', cx - Math.cos(angle + Math.PI / 2) * r);
+    b.setAttribute('y2', cy - Math.sin(angle + Math.PI / 2) * r);
+  }
+
+  function drawLines(alpha) {
+    lc.width = 210; lc.height = 148;
+    if (alpha <= 0) return;
+    sLines.forEach(l => {
+      l.x -= l.spd * alpha * 1.8;
+      if (l.x + l.len < 0) l.x = 180 + Math.random() * 40;
+      ctx.strokeStyle = `rgba(147,197,253,${l.op * alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(l.x, l.y);
+      ctx.lineTo(l.x + l.len, l.y);
+      ctx.stroke();
+    });
+  }
+
+  function goHome() {
+    window.location.href = '/home/';
+  }
+
+  function frame() {
+    t = Math.min(t + 0.013, 1);
+    const p = t;
+
+    const phase1 = Math.min(p / 0.55, 1);
+    const cx = lerp(280, 0, easeOut(phase1));
+    cg.setAttribute('transform', `translate(${cx},0)`);
+
+    if (p < 0.56) wa += 0.18;
+    setSpoke(ra, rb, 54,  128, wa, 13);
+    setSpoke(fa, fb, 154, 128, wa, 13);
+
+    const hlA = phase1 < 1 ? Math.max(0, (1 - phase1 * 1.6)) * 0.9 : 0;
+    hl.setAttribute('opacity', hlA);
+    hlg.setAttribute('opacity', hlA * 0.45);
+
+    drawLines(phase1 < 1 ? (1 - phase1) : 0);
+
+    if (p > 0.52) {
+      const tp = Math.min((p - 0.52) / 0.3, 1);
+      brand.style.opacity   = easeOut(tp);
+      brand.style.transform = `translateX(${lerp(24, 0, easeOut(tp))}px)`;
+    }
+
+    if (p > 0.62) {
+      const tp2 = Math.min((p - 0.62) / 0.28, 1);
+      tagline.style.opacity   = easeOut(tp2);
+      tagline.style.transform = `translateY(${lerp(8, 0, easeOut(tp2))}px)`;
+    }
+
+    if (p > 0.72) {
+      const tp3 = Math.min((p - 0.72) / 0.3, 1);
+      uline.style.width = (easeOut(tp3) * 100) + '%';
+    }
+
+    if (p < 1) {
+      raf = requestAnimationFrame(frame);
+    } else {
+      running = false;
+      if (redirectTimer) clearTimeout(redirectTimer);
+      redirectTimer = setTimeout(goHome, 2000);
+    }
+  }
+
+  function start() {
+    if (running) return;
+    if (redirectTimer) { clearTimeout(redirectTimer); redirectTimer = null; }
+    running = true; t = 0; wa = 0;
+    cancelAnimationFrame(raf);
+
+    brand.style.opacity   = 0;
+    brand.style.transform = 'translateX(24px)';
+    tagline.style.opacity   = 0;
+    tagline.style.transform = 'translateY(8px)';
+    uline.style.transition = 'none';
+    uline.style.width = '0';
+    cg.setAttribute('transform', 'translate(280,0)');
+    ctx.clearRect(0, 0, 210, 148);
+
+    setTimeout(() => { uline.style.transition = ''; frame(); }, 16);
+  }
+
+  wrap.addEventListener('click', start);
+  start();
+</script>
+</body>
+</html>

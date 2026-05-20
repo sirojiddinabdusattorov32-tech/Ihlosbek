@@ -1,0 +1,541 @@
+<style>
+.story-viewer-global { position: fixed; inset: 0; background: black; z-index: 300; display: none; flex-direction: column; }
+.story-viewer-global .story-header { position: absolute; top: 0; left: 0; right: 0; padding: 16px; display: flex; align-items: center; gap: 10px; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); }
+.story-viewer-global .story-header img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.story-viewer-global .story-header .name { color: white; font-weight: 600; font-size: 14px; }
+.story-viewer-global .story-header .close-story { margin-left: auto; color: white; font-size: 24px; cursor: pointer; background: none; border: none; min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; }
+.story-viewer-global .story-media { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+.story-viewer-global .story-media img, .story-viewer-global .story-media video { max-width: 100%; max-height: 100%; object-fit: contain; }
+.story-viewer-global .progress-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 11; display: flex; gap: 4px; padding: 8px 8px 0; }
+.story-viewer-global .progress-bar .segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+.story-viewer-global .progress-bar .segment .fill { height: 100%; background: white; border-radius: 2px; width: 0%; transition: width 0.1s linear; }
+.story-viewer-global .story-footer { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(0,0,0,0.5); flex-wrap: wrap; }
+.story-viewer-global .story-footer input { flex: 1; min-width: 80px; border: none; border-radius: 24px; padding: 10px 16px; font-size: 14px; outline: none; }
+.story-viewer-global .story-footer .like-btn-story { font-size: 24px; cursor: pointer; user-select: none; min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; }
+.story-viewer-global .story-footer .viewers-btn { background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 20px; padding: 10px 16px; font-size: 12px; font-weight: 600; cursor: pointer; white-space:nowrap; }
+.story-viewer-global .story-footer .delete-story-btn { background: rgba(255,50,50,0.3); color: white; border: none; border-radius: 20px; padding: 10px 16px; font-size: 12px; font-weight: 600; cursor: pointer; white-space:nowrap; }
+.story-viewer-global .story-footer .music-edit-btn { background: rgba(29,185,84,0.3); color: white; border: none; border-radius: 20px; padding: 10px 16px; font-size: 12px; font-weight: 600; cursor: pointer; white-space:nowrap; }
+@media (max-width:480px) {
+  .story-viewer-global .story-footer { gap: 6px; padding: 8px 10px; }
+  .story-viewer-global .story-footer input { font-size: 13px; padding: 8px 12px; }
+  .story-viewer-global .story-footer .like-btn-story { font-size: 20px; }
+}
+@media (max-width:360px) {
+  .story-viewer-global .story-header { padding: 10px; }
+  .story-viewer-global .story-header img { width: 28px; height: 28px; }
+  .story-viewer-global .story-header .name { font-size: 12px; }
+  .story-viewer-global .story-footer { gap: 4px; padding: 6px 8px; }
+  .story-viewer-global .story-footer input { font-size: 12px; padding: 6px 10px; }
+  .story-viewer-global .story-footer .like-btn-story { font-size: 18px; min-width:36px; min-height:36px; }
+  .story-viewer-global .story-footer .viewers-btn,
+  .story-viewer-global .story-footer .delete-story-btn,
+  .story-viewer-global .story-footer .music-edit-btn { font-size: 10px; padding: 6px 10px; }
+}
+.story-music-bar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); z-index: 9; pointer-events:none; }
+.story-music-bar img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+.story-music-bar .music-text { flex:1; min-width:0; }
+.story-music-bar .music-text .track { color: white; font-weight: 600; font-size: 13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.story-music-bar .music-text .artist { color: rgba(255,255,255,0.6); font-size: 11px; }
+.story-music-bar .music-icon { font-size: 20px; animation: musicPulse 1s ease-in-out infinite alternate; }
+@keyframes musicPulse { from { opacity: 0.5; } to { opacity: 1; transform: scale(1.1); } }
+</style>
+
+<div class="story-viewer-global" id="globalStoryViewer">
+    <div class="progress-bar" id="globalStoryProgress"></div>
+    <div class="story-header">
+        <img id="globalStoryAvatar" src="" alt="">
+        <span class="name" id="globalStoryName"></span>
+        <button class="close-story" onclick="closeGlobalStory()">&times;</button>
+    </div>
+    <div class="story-media" id="globalStoryMedia">
+        <div class="story-music-bar" id="globalStoryMusicBar" style="display:none;">
+            <span class="music-icon">🎵</span>
+            <img id="globalStoryMusicImg" src="" alt="">
+            <div class="music-text">
+                <div class="track" id="globalStoryMusicName"></div>
+                <div class="artist" id="globalStoryMusicArtist"></div>
+            </div>
+        </div>
+    </div>
+    <div class="story-footer" id="globalStoryFooter">
+        <span class="like-btn-story" id="globalStoryLikeBtn" onclick="toggleGlobalStoryLike()">🤍</span>
+        <span style="color:white;font-size:13px;" id="globalStoryLikeCount"></span>
+        <input type="text" id="globalStoryInput" placeholder="Munosabat bildirish..." onkeydown="if(event.key==='Enter')sendGlobalStoryComment()">
+        <button class="viewers-btn hidden" id="globalStoryViewersBtn" onclick="showGlobalStoryViewers()">Ko'rganlar</button>
+        <button class="delete-story-btn hidden" id="globalStoryDeleteBtn" onclick="deleteGlobalStory()">O'chirish</button>
+    </div>
+</div>
+
+<audio id="globalStoryAudio" preload="auto" style="display:none;"></audio>
+
+<script>
+var gStoryCache = [];
+var gStoryIndex = 0;
+var gStoryTimer = null;
+var gStoryOwner = '';
+var gStoryPaused = false;
+var gStoryMediaDuration = 5;
+var gStoryElapsed = 0;
+var gHoldTimer = null;
+
+function viewGlobalStory(username) {
+    gStoryOwner = username;
+    fetch('/api/stories/').then(function(r){return r.json()}).then(function(data){
+        var list = data.filter(function(s){return s.user.username===username});
+        if (list.length===0) return;
+        gStoryCache = list;
+        gStoryIndex = 0;
+        document.getElementById('globalStoryViewer').style.display = 'flex';
+        showGlobalStory(0);
+    }).catch(function(){});
+}
+
+function showGlobalStory(idx) {
+    if (idx >= gStoryCache.length || idx < 0) { closeGlobalStory(); return; }
+    gStoryIndex = idx;
+    var s = gStoryCache[idx];
+    fetch('/story/' + s.id + '/view/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } });
+    document.getElementById('globalStoryAvatar').src = s.user.avatar || '';
+    document.getElementById('globalStoryName').textContent = s.user.first_name || s.user.username;
+    var bar = document.getElementById('globalStoryProgress');
+    bar.innerHTML = '';
+    gStoryCache.forEach(function(_, i) {
+        var seg = document.createElement('div'); seg.className = 'segment';
+        var fill = document.createElement('div'); fill.className = 'fill';
+        if (i === idx) fill.id = 'globalStoryFill';
+        if (i < idx) fill.style.width = '100%';
+        seg.appendChild(fill); bar.appendChild(seg);
+    });
+    var media = document.getElementById('globalStoryMedia');
+    var duration = 5;
+    gStoryMediaDuration = 5;
+    gStoryElapsed = 0;
+    gStoryPaused = false;
+    if (s.is_video) {
+        media.innerHTML = '<video src="' + s.media + '" autoplay style="max-width:100%;max-height:100%;"></video>' +
+            '<div class="story-music-bar" id="globalStoryMusicBar" style="display:none;"><span class="music-icon">🎵</span><img id="globalStoryMusicImg" src=""><div class="music-text"><div class="track" id="globalStoryMusicName"></div><div class="artist" id="globalStoryMusicArtist"></div></div></div>';
+        var ve = media.querySelector('video');
+        ve.onloadedmetadata = function() {
+            gStoryMediaDuration = ve.duration;
+            duration = ve.duration;
+            var f = document.getElementById('globalStoryFill');
+            if (f) { f.style.transition = 'width ' + ve.duration + 's linear'; f.style.width = '100%'; }
+        };
+        ve.onended = function() { if (!gStoryPaused) showGlobalStory(gStoryIndex + 1); };
+        clearTimeout(gStoryTimer);
+    } else {
+        gStoryMediaDuration = 5;
+        media.innerHTML = '<img src="' + s.media + '" style="max-width:100%;max-height:100%;">' +
+            '<div class="story-music-bar" id="globalStoryMusicBar" style="display:none;"><span class="music-icon">🎵</span><img id="globalStoryMusicImg" src=""><div class="music-text"><div class="track" id="globalStoryMusicName"></div><div class="artist" id="globalStoryMusicArtist"></div></div></div>';
+        var f = document.getElementById('globalStoryFill');
+        if (f) { f.style.transition = 'width 5s linear'; f.style.width = '100%'; }
+        clearTimeout(gStoryTimer);
+        gStoryTimer = setTimeout(function() { showGlobalStory(gStoryIndex + 1); }, duration * 1000);
+    }
+    // Music
+    var musicBar = document.getElementById('globalStoryMusicBar');
+    var audio = document.getElementById('globalStoryAudio');
+    audio.pause();
+    audio.currentTime = 0;
+    if (s.music && s.music.preview_url) {
+        musicBar.style.display = 'flex';
+        document.getElementById('globalStoryMusicImg').src = s.music.album_image || '';
+        document.getElementById('globalStoryMusicName').textContent = s.music.track_name || '';
+        document.getElementById('globalStoryMusicArtist').textContent = (s.music.artist || '') + ' · ' + Math.floor((s.music.start_seconds || 0)/60) + ':' + String((s.music.start_seconds || 0)%60).padStart(2,'0');
+        audio.src = s.music.preview_url;
+        audio.currentTime = (s.music.start_seconds || 0);
+        audio.play().catch(function(){});
+        var musicDuration = (s.music.duration_seconds || 30) * 1000;
+        clearTimeout(gStoryTimer);
+        gStoryTimer = setTimeout(function() { showGlobalStory(gStoryIndex + 1); }, Math.max(duration * 1000, musicDuration));
+    } else if (s.music && s.music.track_name) {
+        musicBar.style.display = 'flex';
+        document.getElementById('globalStoryMusicImg').src = s.music.album_image || '';
+        document.getElementById('globalStoryMusicName').textContent = s.music.track_name || '';
+        document.getElementById('globalStoryMusicArtist').textContent = s.music.artist || '';
+    } else {
+        musicBar.style.display = 'none';
+    }
+    var input = document.getElementById('globalStoryInput');
+    var viewersBtn = document.getElementById('globalStoryViewersBtn');
+    var likeBtn = document.getElementById('globalStoryLikeBtn');
+    var likeCount = document.getElementById('globalStoryLikeCount');
+    var deleteBtn = document.getElementById('globalStoryDeleteBtn');
+    var musicEditBtn = document.getElementById('globalStoryMusicEditBtn');
+    likeBtn.textContent = s.is_liked ? '❤️' : '🤍';
+    likeCount.textContent = s.like_count > 0 ? s.like_count : '';
+    likeBtn.dataset.id = s.id;
+    if (s.user.username === '{{ user.username }}') {
+        input.style.display = 'none';
+        viewersBtn.classList.remove('hidden');
+        viewersBtn.textContent = "Prismort (" + s.view_count + ')';
+        viewersBtn.dataset.viewers = JSON.stringify(s.viewers_list || []);
+        viewersBtn.dataset.likers = JSON.stringify(s.likers_list || []);
+        deleteBtn.classList.remove('hidden');
+        if (!musicEditBtn) {
+            musicEditBtn = document.createElement('button');
+            musicEditBtn.id = 'globalStoryMusicEditBtn';
+            musicEditBtn.className = 'music-edit-btn';
+            musicEditBtn.textContent = '🎵 Musiqani o\'zgartirish';
+            musicEditBtn.onclick = function() { editStoryMusic(s); };
+            document.getElementById('globalStoryFooter').appendChild(musicEditBtn);
+        } else {
+            musicEditBtn.classList.remove('hidden');
+        }
+    } else {
+        input.style.display = '';
+        input.placeholder = 'Munosabat bildirish... @' + s.user.username;
+        viewersBtn.classList.add('hidden');
+        deleteBtn.classList.add('hidden');
+        var meb = document.getElementById('globalStoryMusicEditBtn');
+        if (meb) meb.classList.add('hidden');
+    }
+    var viewer = document.getElementById('globalStoryViewer');
+    viewer.onpointerdown = function(e) {
+        if (e.target.closest('.story-footer,.story-header,.progress-bar')) return;
+        gStoryPaused = false;
+        if (gHoldTimer) clearTimeout(gHoldTimer);
+        gHoldTimer = setTimeout(function() { pauseGlobalStory(); }, 250);
+    };
+    viewer.onpointerup = function(e) {
+        if (e.target.closest('.story-footer,.story-header,.progress-bar')) return;
+        if (gHoldTimer) { clearTimeout(gHoldTimer); gHoldTimer = null; }
+        if (gStoryPaused) {
+            resumeGlobalStory();
+        } else {
+            if (e.clientX > viewer.getBoundingClientRect().width / 2) showGlobalStory(gStoryIndex + 1);
+            else showGlobalStory(gStoryIndex - 1);
+        }
+    };
+    viewer.onpointercancel = function() {
+        if (gHoldTimer) { clearTimeout(gHoldTimer); gHoldTimer = null; }
+        if (gStoryPaused) resumeGlobalStory();
+    };
+}
+
+function closeGlobalStory() {
+    document.getElementById('globalStoryViewer').style.display = 'none';
+    clearTimeout(gStoryTimer);
+    var v = document.querySelector('#globalStoryMedia video');
+    if (v) v.pause();
+    var a = document.getElementById('globalStoryAudio');
+    if (a) a.pause();
+}
+
+function pauseGlobalStory() {
+    if (gStoryPaused) return;
+    gStoryPaused = true;
+    clearTimeout(gStoryTimer);
+    var v = document.querySelector('#globalStoryMedia video');
+    if (v) { v.pause(); }
+    var a = document.getElementById('globalStoryAudio');
+    if (a && !a.paused) a.pause();
+    var f = document.getElementById('globalStoryFill');
+    if (f) {
+        var pRect = f.parentElement.getBoundingClientRect();
+        var fRect = f.getBoundingClientRect();
+        var pct = pRect.width > 0 ? (fRect.width / pRect.width * 100) : 0;
+        f.style.transition = 'none';
+        f.style.width = pct + '%';
+    }
+}
+
+function resumeGlobalStory() {
+    if (!gStoryPaused) return;
+    gStoryPaused = false;
+    clearTimeout(gStoryTimer);
+    var s = gStoryCache[gStoryIndex];
+    if (!s) return;
+    var v = document.querySelector('#globalStoryMedia video');
+    var a = document.getElementById('globalStoryAudio');
+    var f = document.getElementById('globalStoryFill');
+    if (v && s.is_video) {
+        v.play();
+        var remaining = (v.duration || gStoryMediaDuration) - v.currentTime;
+        if (remaining > 0.1 && f) {
+            f.style.transition = 'width ' + remaining + 's linear';
+            f.style.width = '100%';
+        }
+        if (a && a.src) a.play();
+    } else {
+        if (f) {
+            f.style.transition = 'width ' + gStoryMediaDuration + 's linear';
+            f.style.width = '100%';
+        }
+        var musicDur = (s.music && s.music.duration_seconds ? s.music.duration_seconds : 0) * 1000;
+        var imgDur = gStoryMediaDuration * 1000;
+        gStoryTimer = setTimeout(function() { showGlobalStory(gStoryIndex + 1); }, Math.max(imgDur, musicDur));
+        if (a && a.src) a.play();
+    }
+}
+
+function toggleGlobalStoryLike() {
+    var btn = document.getElementById('globalStoryLikeBtn');
+    var id = btn.dataset.id;
+    if (!id) return;
+    fetch('/story/' + id + '/like/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r){return r.json()}).then(function(d){
+            btn.textContent = d.liked ? '❤️' : '🤍';
+            document.getElementById('globalStoryLikeCount').textContent = d.count > 0 ? d.count : '';
+        });
+}
+
+function sendGlobalStoryComment() {
+    var input = document.getElementById('globalStoryInput');
+    var msg = input.value.trim();
+    if (!msg || !gStoryOwner) return;
+    var fd = new FormData();
+    fd.append('content', msg);
+    fd.append('csrfmiddlewaretoken', getCSRFToken());
+    fetch('/chat/' + gStoryOwner + '/', { method: 'POST', body: fd, headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) { if (r.redirected || r.ok) { input.value = ''; alert('Xabar yuborildi!'); } });
+}
+
+function showGlobalStoryViewers() {
+    var btn = document.getElementById('globalStoryViewersBtn');
+    try {
+        var viewers = JSON.parse(btn.dataset.viewers || '[]');
+        var likers = JSON.parse(btn.dataset.likers || '[]');
+        var all = viewers.map(function(v) {
+            v._label = (v.first_name || v.username);
+            if (likers.some(function(l){return l.username===v.username})) v._label += ' ❤️';
+            return v;
+        });
+        var modal = document.getElementById('globalLikersModal') || (function(){
+            var d = document.createElement('div'); d.id = 'globalLikersModal';
+            d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;';
+            d.onclick = function(){this.style.display='none';};
+            d.innerHTML = '<div class="card" onclick="event.stopPropagation()" style="background:white;border-radius:16px;padding:20px;max-width:320px;width:90%;max-height:60vh;overflow-y:auto;"><h3 style="font-weight:700;font-size:16px;margin-bottom:12px;">Prismort</h3><div id="globalLikersContent"></div><button onclick="this.closest(\'#globalLikersModal\').style.display=\'none\'" style="margin-top:12px;padding:8px 20px;background:#eee;border:none;border-radius:8px;cursor:pointer;width:100%;font-weight:600;">Yopish</button></div>';
+            document.body.appendChild(d);
+            return d;
+        })();
+        var html = all.map(function(u) {
+            var av = u.avatar ? '<img src="'+u.avatar+'" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">' : '<div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e0e0e0;color:#666;font-weight:700;font-size:14px;">'+(u.first_name||u.username).charAt(0).toUpperCase()+'</div>';
+            return '<div class="user-row" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;" onclick="location.href=\'/profile/'+u.username+'/\'">'+av+'<span style="font-size:14px;font-weight:500;">'+(u.first_name||u.username)+'</span></div>';
+        }).join('');
+        document.getElementById('globalLikersContent').innerHTML = html;
+        modal.style.display = 'flex';
+    } catch(e){}
+}
+
+function editStoryMusic(s) {
+    var startSec = s.music && s.music.start_seconds ? s.music.start_seconds : 0;
+    function buildModal() {
+        var d = document.createElement('div'); d.id = 'globalEditMusicModal';
+        d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;display:flex;align-items:center;justify-content:center;';
+        d.onclick = function(e) { if (e.target === d) d.style.display = 'none'; };
+        var inner = document.createElement('div');
+        inner.style.cssText = 'background:#1a1a2e;border-radius:20px;max-width:400px;width:90%;max-height:80vh;overflow:hidden;';
+        inner.id = 'globalEditMusicInner';
+        inner.innerHTML =
+            '<div style="padding:20px;text-align:center;">' +
+            '<h3 style="color:white;font-weight:700;font-size:18px;margin-bottom:16px;">Musiqani o\'zgartirish</h3>' +
+            '<input type="text" id="editMusicSearch" placeholder="Spotify dan qidirish..." ' +
+            'style="width:80%;padding:12px 16px;border-radius:24px;border:none;font-size:14px;outline:none;margin-bottom:12px;" ' +
+            'onkeydown="if(event.key===\'Enter\')doEditMusicSearch()">' +
+            '<div id="editMusicResults" style="max-height:300px;overflow-y:auto;text-align:left;"></div>' +
+            '<div id="editMusicCurrentTrack" style="margin-top:12px;display:none;align-items:center;gap:10px;justify-content:center;padding:8px;background:rgba(255,255,255,0.05);border-radius:12px;">' +
+            '<img id="editMusicCurrentImg" src="" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">' +
+            '<div style="flex:1;text-align:left;"><div id="editMusicCurrentName" style="color:white;font-weight:600;font-size:13px;"></div><div id="editMusicCurrentArtist" style="color:rgba(255,255,255,0.5);font-size:11px;"></div></div>' +
+            '</div>' +
+            '<div style="margin-top:12px;display:flex;gap:12px;align-items:center;justify-content:center;">' +
+            '<span style="color:rgba(255,255,255,0.6);font-size:13px;">Boshlanish:</span>' +
+            '<input type="number" id="editMusicMin" value="'+Math.floor(startSec/60)+'" min="0" max="59" style="width:50px;padding:6px;border-radius:8px;border:none;text-align:center;font-size:13px;">' +
+            '<span style="color:white;font-size:14px;">:</span>' +
+            '<input type="number" id="editMusicSec" value="'+(startSec%60)+'" min="0" max="59" style="width:50px;padding:6px;border-radius:8px;border:none;text-align:center;font-size:13px;">' +
+            '</div>' +
+            '<div style="margin-top:16px;display:flex;gap:12px;justify-content:center;">' +
+            '<button onclick="removeStoryMusic('+s.id+')" style="padding:10px 20px;border-radius:24px;border:none;font-weight:600;font-size:13px;cursor:pointer;background:rgba(255,50,50,0.3);color:white;">Musiqani olib tashlash</button>' +
+            '<button onclick="saveStoryMusic('+s.id+')" style="padding:10px 20px;border-radius:24px;border:none;font-weight:600;font-size:13px;cursor:pointer;background:#1DB954;color:white;">Saqlash</button>' +
+            '</div></div>';
+        d.appendChild(inner);
+        document.body.appendChild(d);
+        return d;
+    }
+    var existing = document.getElementById('globalEditMusicModal');
+    if (existing) existing.parentNode.removeChild(existing);
+    var modal = buildModal();
+    modal.style.display = 'flex';
+    setTimeout(function(){var inp = document.getElementById('editMusicSearch'); if(inp) inp.focus();}, 100);
+    // Show current track if exists
+    if (s.music && s.music.track_name) {
+        var ct = document.getElementById('editMusicCurrentTrack');
+        ct.style.display = 'flex';
+        document.getElementById('editMusicCurrentImg').src = s.music.album_image || '';
+        document.getElementById('editMusicCurrentName').textContent = s.music.track_name;
+        document.getElementById('editMusicCurrentArtist').textContent = s.music.artist;
+    }
+}
+
+function doEditMusicSearch() {
+    var q = document.getElementById('editMusicSearch').value.trim();
+    if (!q) return;
+    var r = document.getElementById('editMusicResults');
+    r.innerHTML = '<div style="padding:20px;color:rgba(255,255,255,0.5);text-align:center;">Qidirilmoqda...</div>';
+    fetch('/api/spotify/search/?q=' + encodeURIComponent(q))
+        .then(function(rr){return rr.json()})
+        .then(function(d) {
+            if (!d.tracks || d.tracks.length === 0) {
+                r.innerHTML = '<div style="padding:20px;color:rgba(255,255,255,0.5);text-align:center;">Hech narsa topilmadi</div>';
+                return;
+            }
+            var h = '';
+            d.tracks.forEach(function(t) {
+                var img = t.album_image ? '<img src="' + t.album_image + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;" onerror="this.style.display=\'none\'">' : '<div style="width:40px;height:40px;border-radius:8px;background:#333;display:flex;align-items:center;justify-content:center;color:#666;">🎵</div>';
+                h += '<div class="edit-track-item" data-track-id="' + t.id + '" data-track-name="' + t.name.replace(/"/g,'&quot;') + '" data-track-artist="' + t.artist.replace(/"/g,'&quot;') + '" data-track-image="' + (t.album_image||'') + '" data-preview-url="' + (t.preview_url||'') + '" onclick="selectEditTrack(this)" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;cursor:pointer;">' +
+                    img +
+                    '<div style="flex:1;min-width:0;"><div style="color:white;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.name + '</div><div style="color:rgba(255,255,255,0.5);font-size:11px;">' + t.artist + '</div></div>' +
+                    '<span style="color:rgba(255,255,255,0.3);font-size:11px;white-space:nowrap;">' + Math.floor(t.duration_ms/60000) + ':' + String(Math.floor((t.duration_ms%60000)/1000)).padStart(2,'0') + '</span>' +
+                    '</div>';
+            });
+            r.innerHTML = h;
+        })
+        .catch(function() { r.innerHTML = '<div style="padding:20px;color:rgba(255,255,255,0.5);text-align:center;">Xatolik</div>'; });
+}
+
+function selectEditTrack(el) {
+    var items = document.querySelectorAll('#editMusicResults .edit-track-item');
+    items.forEach(function(item) { item.classList.remove('selected'); item.style.background = ''; });
+    el.classList.add('selected');
+    el.style.background = 'rgba(29,185,84,0.2)';
+}
+
+function saveStoryMusic(storyId) {
+    var trackEl = document.querySelector('#editMusicResults .edit-track-item.selected');
+    if (!trackEl) { alert('Qo\'shiqni tanlang!'); return; }
+    var min = parseInt(document.getElementById('editMusicMin').value) || 0;
+    var sec = parseInt(document.getElementById('editMusicSec').value) || 0;
+    var fd = new FormData();
+    fd.append('spotify_track_id', trackEl.dataset.trackId);
+    fd.append('spotify_track_name', trackEl.dataset.trackName);
+    fd.append('spotify_track_artist', trackEl.dataset.trackArtist);
+    fd.append('spotify_track_image', trackEl.dataset.trackImage);
+    fd.append('spotify_preview_url', trackEl.dataset.previewUrl);
+    fd.append('music_start_seconds', String(min * 60 + sec));
+    fd.append('csrfmiddlewaretoken', getCSRFToken());
+    fetch('/story/' + storyId + '/music/edit/', { method: 'POST', body: fd, headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) {
+            if (r.ok) {
+                document.getElementById('globalEditMusicModal').style.display = 'none';
+                fetch('/api/stories/').then(function(rr){return rr.json()}).then(function(data){
+                    var list = data.filter(function(s){return s.user.username===gStoryOwner});
+                    if (list.length===0) { closeGlobalStory(); return; }
+                    gStoryCache = list;
+                    showGlobalStory(gStoryIndex);
+                });
+            } else { alert('Xatolik'); }
+        });
+}
+
+function removeStoryMusic(storyId) {
+    if (!confirm('Musiqani olib tashlashni xohlaysizmi?')) return;
+    var fd = new FormData();
+    fd.append('spotify_track_id', '');
+    fd.append('csrfmiddlewaretoken', getCSRFToken());
+    fetch('/story/' + storyId + '/music/edit/', { method: 'POST', body: fd, headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) {
+            if (r.ok) {
+                document.getElementById('globalEditMusicModal').style.display = 'none';
+                fetch('/api/stories/').then(function(rr){return rr.json()}).then(function(data){
+                    var list = data.filter(function(s){return s.user.username===gStoryOwner});
+                    if (list.length===0) { closeGlobalStory(); return; }
+                    gStoryCache = list;
+                    showGlobalStory(gStoryIndex);
+                });
+            }
+        });
+}
+
+function saveStoryMusic(storyId) {
+    var trackEl = document.querySelector('#editMusicResults .music-track-item.selected');
+    if (!trackEl) { alert('Qo\'shiqni tanlang!'); return; }
+    var min = parseInt(document.getElementById('editMusicMin').value) || 0;
+    var sec = parseInt(document.getElementById('editMusicSec').value) || 0;
+    var fd = new FormData();
+    fd.append('spotify_track_id', trackEl.dataset.trackId);
+    fd.append('spotify_track_name', trackEl.dataset.trackName);
+    fd.append('spotify_track_artist', trackEl.dataset.trackArtist);
+    fd.append('spotify_track_image', trackEl.dataset.trackImage);
+    fd.append('spotify_preview_url', trackEl.dataset.previewUrl);
+    fd.append('music_start_seconds', String(min * 60 + sec));
+    fd.append('csrfmiddlewaretoken', getCSRFToken());
+    fetch('/story/' + storyId + '/music/edit/', { method: 'POST', body: fd, headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) {
+            if (r.ok) {
+                document.getElementById('globalEditMusicModal').style.display = 'none';
+                // Reload story data
+                fetch('/api/stories/').then(function(rr){return rr.json()}).then(function(data){
+                    var list = data.filter(function(s){return s.user.username===gStoryOwner});
+                    if (list.length===0) { closeGlobalStory(); return; }
+                    gStoryCache = list;
+                    showGlobalStory(gStoryIndex);
+                });
+            } else { alert('Xatolik'); }
+        });
+}
+
+function removeStoryMusic(storyId) {
+    if (!confirm('Musiqani olib tashlashni xohlaysizmi?')) return;
+    var fd = new FormData();
+    fd.append('spotify_track_id', '');
+    fd.append('csrfmiddlewaretoken', getCSRFToken());
+    fetch('/story/' + storyId + '/music/edit/', { method: 'POST', body: fd, headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) {
+            if (r.ok) {
+                document.getElementById('globalEditMusicModal').style.display = 'none';
+                fetch('/api/stories/').then(function(rr){return rr.json()}).then(function(data){
+                    var list = data.filter(function(s){return s.user.username===gStoryOwner});
+                    if (list.length===0) { closeGlobalStory(); return; }
+                    gStoryCache = list;
+                    showGlobalStory(gStoryIndex);
+                });
+            }
+        });
+}
+
+function selectEditMusic(id, name, artist, albumImage, previewUrl, durationMs) {
+    // Remove previous selection
+    var items = document.querySelectorAll('#editMusicResults .music-track-item');
+    items.forEach(function(item) { item.classList.remove('selected'); item.style.background = ''; });
+    // Find and mark the clicked one
+    var allTracks = document.querySelectorAll('#editMusicResults .music-track-item');
+    for (var i = 0; i < allTracks.length; i++) {
+        if (allTracks[i].dataset.trackId === id) {
+            allTracks[i].classList.add('selected');
+            allTracks[i].style.background = 'rgba(29,185,84,0.2)';
+            break;
+        }
+    }
+}
+
+function deleteGlobalStory() {
+    var s = gStoryCache[gStoryIndex];
+    if (!s || !confirm('Storyni ochirishni xohlaysizmi?')) return;
+    fetch('/story/' + s.id + '/delete/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() }})
+        .then(function(r) {
+            if (r.ok) {
+                gStoryCache.splice(gStoryIndex, 1);
+                if (gStoryCache.length === 0) { closeGlobalStory(); location.reload(); return; }
+                showGlobalStory(Math.min(gStoryIndex, gStoryCache.length - 1));
+            }
+        });
+}
+
+function getCSRFToken() {
+    var cookies = document.cookie.split('; ');
+    for (var i = 0; i < cookies.length; i++) {
+        var parts = cookies[i].split('=');
+        if (parts[0] === 'csrftoken') return parts[1];
+    }
+    return '';
+}
+
+document.addEventListener('click', function(e) {
+    var avatar = e.target.closest('.avatar, .avatar-letter');
+    if (avatar) {
+        e.stopPropagation();
+        var username = avatar.dataset.username;
+        if (username) viewGlobalStory(username);
+    }
+}, true);
+</script>

@@ -1,0 +1,285 @@
+{% load static %}
+<div class="bg-white border-b border-gray-200 px-4 sm:px-6 py-2 hidden sm:flex items-center justify-between text-sm text-gray-600">
+  <div class="flex items-center gap-1">
+    {% for lang in languages %}
+    <a href="{% url 'set_language' %}?lang={{ lang.code }}&next={{ request.path }}" class="px-1.5 py-0.5 text-xs font-semibold rounded {% if current_lang == lang.code %}bg-blue-600 text-white{% else %}text-gray-600 hover:text-blue-600{% endif %}">{{ lang.flag }}</a>
+    {% endfor %}
+  </div>
+  <div class="flex items-center gap-4 auth-desktop">
+    {% if user.is_authenticated %}
+      <button id="chatlist-btn" class="text-gray-500 hover:text-blue-600 text-lg sm:text-xl" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;">
+        <i class="fa-solid fa-comment-sms"></i>
+      </button>
+      <button id="notif-btn" class="relative text-gray-500 hover:text-blue-600 text-lg sm:text-xl" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;">
+        <i class="fa-solid fa-bell"></i>
+        <span id="notif-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden" style="font-size:9px;line-height:1">0</span>
+      </button>
+      <div class="flex items-center gap-2">
+        {% if user.profile.avatar %}
+          <img src="{{ user.profile.avatar.url }}" class="avatar w-7 h-7 rounded-full object-cover border border-gray-200" data-username="{{ user.username }}">
+        {% else %}
+          <div class="avatar-letter w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold" data-username="{{ user.username }}">{{ user.username|first|upper }}</div>
+{% endif %}
+{% if user.is_authenticated %}
+{% include 'partials/call_global.html' %}
+{% endif %}
+        <a href="{% url 'profile' user.username %}" class="font-semibold text-gray-700 hover:text-blue-600 username-text">{{ user.username }}</a>
+        <a href="{% url 'logout' %}" class="text-red-500 hover:underline text-xs">Chiqish</a>
+      </div>
+    {% else %}
+      <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline text-xs sm:text-sm">Ro'yxatdan o'tish</a>
+      <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:underline text-xs sm:text-sm">Kirish</a>
+    {% endif %}
+  </div>
+</div>
+
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 relative">
+    <!-- Mobile row: logo + auth + search -->
+    <div class="flex flex-col gap-2 sm:hidden">
+      <div class="flex items-center justify-between">
+        <a href="{% url 'home' %}" class="text-xl font-extrabold tracking-tight text-gray-900">
+          avtosotuv<span class="text-blue-600">.uz</span>
+        </a>
+        <div class="flex items-center gap-1">
+          {% if user.is_authenticated %}
+            <button id="chatlist-btn-mobile" class="text-gray-500 hover:text-blue-600 text-lg" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;" onclick="document.getElementById('chatlist-btn')?.click()">
+              <i class="fa-solid fa-comment-sms"></i>
+            </button>
+            <button id="notif-btn-mobile" class="relative text-gray-500 hover:text-blue-600 text-lg" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid fa-bell"></i>
+              <span id="notif-badge-mobile" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden" style="font-size:9px;line-height:1">0</span>
+            </button>
+            {% if user.profile.avatar %}
+              <img src="{{ user.profile.avatar.url }}" class="avatar w-7 h-7 rounded-full object-cover border border-gray-200 cursor-pointer" onclick="location.href='{% url 'profile' user.username %}'" data-username="{{ user.username }}">
+            {% else %}
+              <div class="avatar-letter w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold cursor-pointer" onclick="location.href='{% url 'profile' user.username %}'" data-username="{{ user.username }}">{{ user.username|first|upper }}</div>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline text-xs">Ro'yxat</a>
+            <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:underline text-xs">Kirish</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        {% if request.path == '/search/' %}
+        <div style="position:relative;width:100%;display:flex;">
+        <input type="text" id="searchInput" class="flex-1 px-4 py-2.5 pl-10 border border-gray-300 rounded-l-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="Profil yoki moshina qidirish..." value="{{ query }}" autofocus onkeydown="if(event.key==='Enter'){doSearch()}">
+        <i class="fa-solid fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:14px;pointer-events:none;"></i>
+        <button onclick="doSearch()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-r-xl whitespace-nowrap transition">Qidirish</button>
+        </div>
+        <script>function doSearch(){var v=document.getElementById('searchInput').value.trim();if(v)window.location.href='/search/?q='+encodeURIComponent(v)}</script>
+        {% else %}
+        <a href="{% url 'search' %}" class="w-full flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-white transition">
+          <i class="fa-solid fa-search"></i>
+          <span>Profil yoki moshina qidirish...</span>
+        </a>
+        {% endif %}
+        <a href="{% url 'product_add' %}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">Mahsulot qo'shish</a>
+      </div>
+    </div>
+
+    <!-- Desktop: all in one row -->
+    <div class="hidden sm:flex items-center justify-between gap-2 search-group" id="desktop-search">
+      <a href="{% url 'home' %}" class="text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900 shrink-0">
+        avtosotuv<span class="text-blue-600">.uz</span>
+      </a>
+      <div class="flex items-center gap-2 mx-auto">
+        <input type="text" id="navProfileSearch" class="w-40 lg:w-48 px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition profile-search-input" placeholder="Profil qidirish..." onkeydown="if(event.key==='Enter'){var v=this.value.trim();if(v)window.location.href='/search/?q='+encodeURIComponent(v)}">
+        <div class="flex items-center gap-1 w-48 lg:w-56">
+          <input type="text" id="navProductSearch" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition" placeholder="Mahsulot qidirish..." onkeydown="if(event.key==='Enter')searchProducts()">
+          <button onclick="searchProducts()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2.5 rounded-xl whitespace-nowrap transition flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <span class="hidden md:inline">Qidirish</span>
+          </button>
+        </div>
+      </div>
+      <script>
+      function searchProducts() {
+        var v = document.getElementById('navProductSearch').value.trim().toLowerCase();
+        var cards = document.querySelectorAll('.product-card');
+        cards.forEach(function(c) {
+          var text = (c.textContent || c.innerText).toLowerCase();
+          c.style.display = (!v || text.includes(v)) ? '' : 'none';
+        });
+      }
+      </script>
+      <a href="{% url 'product_add' %}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl whitespace-nowrap transition btn-add-product shrink-0">Mahsulot qo'shish</a>
+      <div id="shared-dropdown" class="absolute top-full left-0 right-0 mt-1 w-full max-w-2xl mx-auto bg-white border border-gray-200 rounded-xl shadow-xl z-50 hidden overflow-hidden">
+        <div id="dropdown-content" class="max-h-80 overflow-y-auto">
+          <div class="p-4 text-center text-gray-400 text-sm">Yuklanmoqda...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+{% if user.is_authenticated %}
+<script>
+function getCSRFToken() {
+  var cookies = document.cookie.split(';');
+  for (var i = 0; i < cookies.length; i++) {
+    var c = cookies[i].trim();
+    if (c.startsWith('csrftoken=')) return c.substring(10);
+  }
+  return '';
+}
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(text));
+  return div.innerHTML;
+}
+
+function fetchNotifications() {
+  fetch('/notifications/')
+    .then(r => r.json())
+    .then(data => {
+      ['notif-badge','notif-badge-mobile'].forEach(function(id) {
+        var badge = document.getElementById(id);
+        if (!badge) return;
+        if (data.count > 0) {
+          badge.textContent = data.count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      });
+    });
+}
+
+function renderChatList(list, chats) {
+  if (!chats || chats.length === 0) {
+    list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Xabarlar yo\'q</div>';
+    return;
+  }
+  var html = '';
+  chats.forEach(function(c) {
+    var avatarHtml;
+    if (c.avatar) {
+      avatarHtml = '<img src="' + c.avatar + '" class="w-10 h-10 rounded-full object-cover border border-gray-200">';
+    } else {
+      avatarHtml = '<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-bold">' + c.username.charAt(0).toUpperCase() + '</div>';
+    }
+    html +=
+      '<div class="flex items-center gap-3 p-3 border-b border-gray-50 hover:bg-gray-50">' +
+        avatarHtml +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="font-semibold text-gray-800 text-sm">' + c.first_name + '</div>' +
+          '<div class="text-gray-400 text-xs truncate">' + escapeHtml(c.last_message) + '</div>' +
+        '</div>' +
+        '<div class="text-right shrink-0">' +
+          (c.last_time ? '<div class="text-gray-400 text-xs">' + c.last_time + '</div>' : '') +
+          '<a href="/chat/' + c.username + '/" class="block mt-1 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 whitespace-nowrap">SMS yozish</a>' +
+        '</div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function renderNotifList(list, items) {
+  if (!items || items.length === 0) {
+    list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Yangi bildirishnomalar yo\'q</div>';
+    return;
+  }
+  var html = '';
+  items.forEach(function(item) {
+    var avatarHtml;
+    if (item.avatar) {
+      avatarHtml = '<img src="' + item.avatar + '" class="w-10 h-10 rounded-full object-cover border border-gray-200">';
+    } else {
+      avatarHtml = '<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-bold">' + item.username.charAt(0).toUpperCase() + '</div>';
+    }
+    var iconHtml = '';
+    if (item.type === 'subscribe') {
+      iconHtml = '<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white" style="font-size:8px;"><i class="fa-solid fa-user-plus"></i></div>';
+    } else if (item.type === 'like') {
+      iconHtml = '<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white" style="font-size:8px;"><i class="fa-solid fa-heart"></i></div>';
+    } else if (item.type === 'message') {
+      iconHtml = '<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white" style="font-size:8px;"><i class="fa-solid fa-comment"></i></div>';
+    }
+    html +=
+      '<a href="' + item.link + '" class="flex items-center gap-3 p-3 border-b border-gray-50 hover:bg-gray-50 no-underline">' +
+        '<div class="relative">' + avatarHtml + iconHtml + '</div>' +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="font-semibold text-gray-800 text-sm">' + item.first_name + '</div>' +
+          '<div class="text-gray-400 text-xs truncate">' + escapeHtml(item.text) + '</div>' +
+        '</div>' +
+      '</a>';
+  });
+  list.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetchNotifications();
+  setInterval(fetchNotifications, 5000);
+
+  var dropdown = document.getElementById('shared-dropdown');
+  var content = document.getElementById('dropdown-content');
+
+  var chatBtn = document.getElementById('chatlist-btn');
+  var notifBtn = document.getElementById('notif-btn');
+
+  function showChatList() {
+    dropdown.classList.remove('hidden');
+    content.innerHTML = '<div class="p-3 border-b border-gray-100 font-semibold text-gray-700 text-sm">Xabarlar</div><div class="p-4 text-center text-gray-400 text-sm">Yuklanmoqda...</div>';
+    fetch('/chat-list/')
+      .then(r => r.json())
+      .then(data => {
+        var list = content.querySelector('.p-4') || content;
+        content.innerHTML = '<div class="p-3 border-b border-gray-100 font-semibold text-gray-700 text-sm">Xabarlar</div><div id="clist"></div>';
+        renderChatList(document.getElementById('clist'), data.chats);
+      });
+  }
+
+  function showNotifs() {
+    dropdown.classList.remove('hidden');
+    content.innerHTML = '<div class="p-3 border-b border-gray-100 font-semibold text-gray-700 text-sm">Bildirishnomalar</div><div class="p-4 text-center text-gray-400 text-sm">Yuklanmoqda...</div>';
+    // Mark notifications as read
+    fetch('/notifications/read/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } });
+    ['notif-badge','notif-badge-mobile'].forEach(function(id) {
+      var badge = document.getElementById(id);
+      if (badge) badge.classList.add('hidden');
+    });
+    fetch('/notifications/')
+      .then(r => r.json())
+      .then(data => {
+        content.innerHTML = '<div class="p-3 border-b border-gray-100 font-semibold text-gray-700 text-sm">Bildirishnomalar</div><div id="nlist"></div>';
+        renderNotifList(document.getElementById('nlist'), data.items);
+      });
+  }
+
+  [chatBtn, document.getElementById('chatlist-btn-mobile')].forEach(function(btn) {
+    if (!btn) return;
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!dropdown.classList.contains('hidden') && content.dataset.mode === 'chat') {
+        dropdown.classList.add('hidden');
+        return;
+      }
+      showChatList();
+      content.dataset.mode = 'chat';
+    });
+  });
+
+  [notifBtn, document.getElementById('notif-btn-mobile')].forEach(function(btn) {
+    if (!btn) return;
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!dropdown.classList.contains('hidden') && content.dataset.mode === 'notif') {
+        dropdown.classList.add('hidden');
+        return;
+      }
+      showNotifs();
+      content.dataset.mode = 'notif';
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.max-w-7xl')) {
+      dropdown.classList.add('hidden');
+    }
+  });
+});
+</script>
+{% endif %}

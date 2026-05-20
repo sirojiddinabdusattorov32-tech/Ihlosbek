@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilni tahrirlash</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen" style="font-family: 'Manrope', sans-serif;">
+
+{% include 'partials/navbar.html' %}
+
+<div class="max-w-lg mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Profilni tahrirlash</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+
+            <div class="text-center mb-4">
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" class="avatar w-24 h-24 rounded-full object-cover mx-auto border-4 border-blue-100" data-username="{{ profile.user.username }}">
+                {% else %}
+                    <div class="avatar-letter w-24 h-24 rounded-full bg-blue-100 mx-auto border-4 border-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold" data-username="{{ profile.user.username }}">{{ profile.user.username|first|upper }}</div>
+                {% endif %}
+                <label class="inline-block mt-3 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm text-gray-600 font-medium cursor-pointer transition">
+                    Rasmni o'zgartirish
+                    <input type="file" name="avatar" accept="image/*" class="hidden" onchange="this.form.submit()">
+                </label>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Nik-name</label>
+                <input type="text" name="nickname" value="{{ profile.user.username }}" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Ism</label>
+                <input type="text" name="full_name" value="{{ profile.user.first_name }}" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Ismingiz">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Telefon</label>
+                <input type="text" name="phone" value="{{ profile.phone }}" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Viloyat</label>
+                <select name="region" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                    <option value="">Viloyatni tanlang</option>
+                    <option value="qoraqalpogiston" {% if profile.region == 'qoraqalpogiston' %}selected{% endif %}>Qoraqalpog'iston</option>
+                    <option value="andijon" {% if profile.region == 'andijon' %}selected{% endif %}>Andijon</option>
+                    <option value="buxoro" {% if profile.region == 'buxoro' %}selected{% endif %}>Buxoro</option>
+                    <option value="jizzax" {% if profile.region == 'jizzax' %}selected{% endif %}>Jizzax</option>
+                    <option value="qashqadaryo" {% if profile.region == 'qashqadaryo' %}selected{% endif %}>Qashqadaryo</option>
+                    <option value="navoiy" {% if profile.region == 'navoiy' %}selected{% endif %}>Navoiy</option>
+                    <option value="namangan" {% if profile.region == 'namangan' %}selected{% endif %}>Namangan</option>
+                    <option value="samarqand" {% if profile.region == 'samarqand' %}selected{% endif %}>Samarqand</option>
+                    <option value="surxondaryo" {% if profile.region == 'surxondaryo' %}selected{% endif %}>Surxondaryo</option>
+                    <option value="sirdaryo" {% if profile.region == 'sirdaryo' %}selected{% endif %}>Sirdaryo</option>
+                    <option value="toshkent" {% if profile.region == 'toshkent' %}selected{% endif %}>Toshkent viloyati</option>
+                    <option value="fargona" {% if profile.region == 'fargona' %}selected{% endif %}>Farg'ona</option>
+                    <option value="xorazm" {% if profile.region == 'xorazm' %}selected{% endif %}>Xorazm</option>
+                    <option value="toshkent_sh" {% if profile.region == 'toshkent_sh' %}selected{% endif %}>Toshkent shahri</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Eski parol</label>
+                <input type="password" name="old_password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Eski parolingiz">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Yangi parol (agar o'zgartirmoqchi bo'lsangiz)</label>
+                <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Yangi parol">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-sm">Saqlash</button>
+        </form>
+
+        <p class="text-center mt-6">
+            <a href="{% url 'profile' profile.user.username %}" class="text-blue-600 text-sm hover:underline">&larr; Ortga</a>
+        </p>
+    </div>
+</div>
+{% include 'partials/story_viewer_global.html' %}
+{% include 'partials/futer.html' %}
+</body>
+</html>

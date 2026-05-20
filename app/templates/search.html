@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qidiruv</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col" style="font-family: 'Manrope', sans-serif;">
+{% include 'partials/navbar.html' %}
+
+<div class="max-w-lg mx-auto w-full px-4 py-4 flex-1">
+    {% if query %}
+        {% if not profiles and not products %}
+            <p class="text-gray-400 text-center py-8">Hech narsa topilmadi</p>
+        {% else %}
+            {% if profiles %}
+            <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Profil</h2>
+            <div class="space-y-2 mb-6">
+                {% for p in profiles %}
+                <a href="{% url 'profile' p.user.username %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition border border-gray-100 bg-white shadow-sm">
+                    {% if p.avatar %}
+                        <img src="{{ p.avatar.url }}" class="avatar w-12 h-12 rounded-full object-cover" data-username="{{ p.user.username }}">
+                    {% else %}
+                        <div class="avatar-letter w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-lg font-bold" data-username="{{ p.user.username }}">{{ p.user.username|first|upper }}</div>
+                    {% endif %}
+                    <div>
+                        <div class="font-semibold text-gray-900">{{ p.user.first_name|default:p.user.username }}</div>
+                        <div class="text-sm text-gray-500">@{{ p.user.username }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if products %}
+            <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Moshinalar</h2>
+            <div class="space-y-2">
+                {% for p in products %}
+                <a href="{% url 'chat' p.user.username %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition border border-gray-100 bg-white shadow-sm">
+                    <img src="{{ p.image.url }}" class="w-14 h-14 rounded-xl object-cover" alt="{{ p.name }}">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-gray-900 text-sm">🚗 {{ p.car_model|default:p.name }}</div>
+                        {% if p.price %}<div class="text-xs font-bold text-blue-600">{{ p.price }}</div>{% endif %}
+                        {% if p.mileage %}<div class="text-xs text-gray-500">⏱ {{ p.mileage }}</div>{% endif %}
+                    </div>
+                    <span class="text-xs text-gray-400 whitespace-nowrap">@{{ p.user.username }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p class="text-gray-400 text-center py-8">Profil yoki moshina nomini kiriting</p>
+    {% endif %}
+</div>
+
+{% include 'partials/futer.html' %}
+{% include 'partials/story_viewer_global.html' %}
+</body>
+</html>

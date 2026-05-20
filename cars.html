@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mashinalar Olami</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            height: 100vh;
+            overflow-x: hidden;
+            background: #111;
+            margin: 0;
+        }
+
+        .slider {
+            position: relative;
+            width: 100%;
+            max-width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .slider .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .slider .slide.active {
+            opacity: 1;
+        }
+
+        .slider .slide img {
+            width: 100%;
+            max-width: 100vw;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .slider .slide::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100vw;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .overlay h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: #ffd700;
+            text-shadow:
+                0 0 10px rgba(255, 215, 0, 0.8),
+                0 0 30px rgba(255, 215, 0, 0.5),
+                0 0 60px rgba(255, 215, 0, 0.3);
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow:
+                    0 0 10px rgba(255, 215, 0, 0.8),
+                    0 0 30px rgba(255, 215, 0, 0.5),
+                    0 0 60px rgba(255, 215, 0, 0.3);
+            }
+            to {
+                text-shadow:
+                    0 0 15px rgba(255, 215, 0, 1),
+                    0 0 40px rgba(255, 215, 0, 0.7),
+                    0 0 80px rgba(255, 215, 0, 0.5),
+                    0 0 120px rgba(255, 215, 0, 0.3);
+            }
+        }
+
+        .overlay p {
+            font-size: 1.6rem;
+            color: #00ffff;
+            text-shadow:
+                0 0 8px rgba(0, 255, 255, 0.8),
+                0 0 25px rgba(0, 255, 255, 0.4);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .overlay .sub {
+            font-size: 1.2rem;
+            color: #ff69b4;
+            text-shadow:
+                0 0 8px rgba(255, 105, 180, 0.8),
+                0 0 20px rgba(255, 105, 180, 0.4);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .overlay .btn {
+            margin-top: 40px;
+            padding: 16px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #fff;
+            background: linear-gradient(45deg, #ff4500, #ff8c00);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow:
+                0 0 20px rgba(255, 69, 0, 0.6),
+                0 0 40px rgba(255, 69, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .overlay .btn:hover {
+            transform: scale(1.08);
+            box-shadow:
+                0 0 30px rgba(255, 69, 0, 0.8),
+                0 0 60px rgba(255, 69, 0, 0.5);
+        }
+
+        .slide-counter {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            gap: 14px;
+        }
+
+        .slide-counter .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-counter .dot.active {
+            background: #ffd700;
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .overlay h1 {
+                font-size: 2.5rem;
+                letter-spacing: 3px;
+            }
+            .overlay p {
+                font-size: 1.1rem;
+            }
+            .overlay .sub {
+                font-size: 0.9rem;
+            }
+            .overlay .btn {
+                padding: 14px 35px;
+                font-size: 1rem;
+            }
+            .slide-counter .dot {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .overlay h1 {
+                font-size: 1.8rem;
+                margin-bottom: 12px;
+            }
+            .overlay p {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+            }
+            .overlay .sub {
+                font-size: 0.8rem;
+            }
+            .overlay .btn {
+                margin-top: 24px;
+                padding: 12px 28px;
+                font-size: 0.9rem;
+            }
+            .slide-counter {
+                bottom: 24px;
+                gap: 10px;
+            }
+            .slide-counter .dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .overlay h1 {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
+            }
+            .overlay p {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slider" id="slider">
+
+        <div class="slide active">
+            <img src="media/cars/654588713_18070108784281054_7006927776630928180_n.jpg" alt="Mashina 1">
+        </div>
+        <div class="slide">
+            <img src="media/cars/655273912_4057849471013837_1635874543743888360_n.jpg" alt="Mashina 2">
+        </div>
+        <div class="slide">
+            <img src="media/cars/657687877_18048439088537713_3493590675184999162_n.jpg" alt="Mashina 3">
+        </div>
+        <div class="slide">
+            <img src="media/cars/657771096_17928889617247030_7905757072033984407_n.jpg" alt="Mashina 4">
+        </div>
+
+        <div class="overlay">
+            <h1>Mashinalar Olami</h1>
+            <p>🏎️ Tezlik · Kuch · Go'zallik</p>
+            <div class="sub">Har bir detal mukammallik uchun</div>
+            <button class="btn">Batafsil</button>
+        </div>
+
+        <div class="slide-counter" id="dots"></div>
+    </div>
+
+    <script>
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('dots');
+
+        for (let i = 0; i < slides.length; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.dataset.index = i;
+            dot.addEventListener('click', function() {
+                goToSlide(parseInt(this.dataset.index));
+                resetTimer();
+            });
+            dotsContainer.appendChild(dot);
+        }
+
+        const dots = document.querySelectorAll('.dot');
+
+        function goToSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentIndex = index;
+        }
+
+        function nextSlide() {
+            const next = (currentIndex + 1) % slides.length;
+            goToSlide(next);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timer = setInterval(nextSlide, 4000);
+        }
+
+        let timer = setInterval(nextSlide, 4000);
+    </script>
+
+</body>
+</html>
