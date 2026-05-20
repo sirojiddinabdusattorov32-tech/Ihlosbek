@@ -73,31 +73,14 @@ import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(default='postgres://postgres:postgres@localhost:5432/avtosotuv_db', conn_max_age=600),
-        'ATOMIC_REQUESTS': True,
-        'OPTIONS': {
-            'connect_timeout': 10,
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 10,
-            'keepalives_count': 5,
-        },
-    },
-    'replica': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'avtosotuv_db',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'CONN_MAX_AGE': 600,
-        'OPTIONS': {
-            'connect_timeout': 10,
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 10,
-            'keepalives_count': 5,
-        },
-    }
+}
+DATABASES['default']['ATOMIC_REQUESTS'] = True
+DATABASES['default']['OPTIONS'] = {
+    'connect_timeout': 10,
+    'keepalives': 1,
+    'keepalives_idle': 30,
+    'keepalives_interval': 10,
+    'keepalives_count': 5,
 }
 
 CACHES = {
@@ -123,8 +106,7 @@ CACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 300
 CACHE_MIDDLEWARE_KEY_PREFIX = 'avto'
 
-# Read replica database router
-DATABASE_ROUTERS = ['main.db_router.PrimaryReplicaRouter']
+
 
 # pagination
 REST_FRAMEWORK = {

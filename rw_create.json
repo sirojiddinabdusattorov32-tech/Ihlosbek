@@ -1,0 +1,1 @@
+{"query":"mutation projectCreate($name: String!) { projectCreate(name: $name) { id name } }","variables":{"name":"avtosotuv-uz"}}
