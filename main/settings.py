@@ -86,28 +86,34 @@ DATABASES['default']['OPTIONS'] = {
     'keepalives_count': 5,
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'PARSER_CLASS': 'redis.connection.DefaultParser',
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-            'IGNORE_EXCEPTIONS': True,
-        },
-        'KEY_PREFIX': 'avto',
-        'TIMEOUT': 300,
+if os.environ.get('REDIS_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.environ.get('REDIS_URL'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'PARSER_CLASS': 'redis.connection.DefaultParser',
+                'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+                'IGNORE_EXCEPTIONS': True,
+            },
+            'KEY_PREFIX': 'avto',
+            'TIMEOUT': 300,
+        }
     }
-}
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
-
-# Cache middleware
-CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = 300
-CACHE_MIDDLEWARE_KEY_PREFIX = 'avto'
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+    CACHE_MIDDLEWARE_ALIAS = 'default'
+    CACHE_MIDDLEWARE_SECONDS = 300
+    CACHE_MIDDLEWARE_KEY_PREFIX = 'avto'
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'avto-cache',
+            'TIMEOUT': 300,
+        }
+    }
 
 
 
@@ -163,7 +169,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000,https://avtosotuv-production.up.railway.app').split(',')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
