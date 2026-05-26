@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Xabarlar — avtosotuv.uz{% endblock %}
+
+{% block redirect %}{% endblock %}
+{% block loading %}{% endblock %}
+
+{% block extra_style %}
+<style>
+    body { background: #f5f5f5; }
+    .chat-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: white; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.15s; text-decoration: none; color: inherit; }
+    .chat-item:hover { background: #f9fafb; }
+    .chat-item .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .chat-item .avatar-letter { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #6b7280; font-weight: 700; font-size: 18px; flex-shrink: 0; }
+    .chat-item .info { flex: 1; min-width: 0; }
+    .chat-item .info .name { font-weight: 600; font-size: 14px; color: #1f2937; }
+    .chat-item .info .preview { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-item .time { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
+    .chat-item .online-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; border: 2px solid white; position: absolute; bottom: 0; right: 0; }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'partials/navbar.html' %}
+
+<div class="w-full mx-auto" style="max-width:100%">
+    <div class="bg-white sm:rounded-2xl sm:shadow-lg overflow-hidden" style="border-radius:0">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+            <a href="javascript:history.back()" class="text-gray-500 hover:text-gray-700 sm:hidden">&larr;</a>
+            <h1 class="text-lg font-bold text-gray-900"><i class="fa-solid fa-message text-blue-600 mr-1"></i> Xabarlar</h1>
+        </div>
+        <div>
+            {% for c in chat_users %}
+            <a href="{% url 'chat' c.user.username %}" class="chat-item">
+                <div class="avatar-wrap">
+                    {% if c.profile.avatar %}
+                    <img src="{{ c.profile.avatar.url }}" class="avatar" data-username="{{ c.user.username }}">
+                    {% else %}
+                    <div class="avatar-letter" data-username="{{ c.user.username }}">{{ c.user.username|first|upper }}</div>
+                    {% endif %}
+                    {% if c.profile.last_activity and c.profile.last_activity > now_minus_15 %}
+                    <div class="online-dot"></div>
+                    {% endif %}
+                </div>
+                <div class="info">
+                    <div class="name">{{ c.user.first_name|default:c.user.username }}</div>
+                    <div class="preview">{{ c.last_message }}</div>
+                </div>
+                {% if c.last_time %}
+                <div class="time">{{ c.last_time|date:"H:i" }}</div>
+                {% endif %}
+            </a>
+            {% empty %}
+            <div class="text-center text-gray-400 py-16">
+                <div class="text-6xl mb-4">💬</div>
+                <p class="text-lg font-semibold mb-1">Hozircha xabarlar yo'q</p>
+                <p class="text-sm">Kimningdir profiliga o'tib, "SMS yozish" tugmasini bosing</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

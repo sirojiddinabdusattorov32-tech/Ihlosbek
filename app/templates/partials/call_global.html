@@ -153,6 +153,8 @@ var globalRingtoneInterval = null;
 var globalPendingCaller = null;
 var bannerVisible = false;
 var notifiedCallId = 0;
+var _sharedWsCreated = false;
+var _sharedWsHandlers = [];
 
 // === WEBRTC GLOBALS ===
 var gLocalStream = null;
@@ -197,21 +199,28 @@ function getGlobalWsUrl() {
 }
 
 function connectGlobalWebSocket() {
+    if (window.__callWs && (window.__callWs.readyState === WebSocket.OPEN || window.__callWs.readyState === WebSocket.CONNECTING)) {
+        globalSocket = window.__callWs;
+        return;
+    }
     if (globalSocket && (globalSocket.readyState === WebSocket.OPEN || globalSocket.readyState === WebSocket.CONNECTING)) return;
     globalSocket = new WebSocket(getGlobalWsUrl());
-    globalSocket.onopen = function() {
+    window.__callWs = globalSocket;
+    _sharedWsCreated = true;
+    globalSocket.addEventListener('open', function() {
         if (globalReconnectTimer) { clearTimeout(globalReconnectTimer); globalReconnectTimer = null; }
-    };
-    globalSocket.onclose = function() {
+    });
+    globalSocket.addEventListener('close', function() {
         if (!globalReconnectTimer) {
             globalReconnectTimer = setTimeout(function() { connectGlobalWebSocket(); }, 3000);
         }
-    };
-    globalSocket.onmessage = function(event) {
+    });
+    globalSocket.addEventListener('message', function(event) {
         var data = JSON.parse(event.data);
+        var onChatPage = window.location.pathname.indexOf('/chat/') !== -1;
         switch (data.type) {
             case 'incoming_call':
-                showIncomingCallGlobal(data);
+                if (!onChatPage) showIncomingCallGlobal(data);
                 break;
             case 'call_answered':
                 gHandleCallAnswered(data);
@@ -221,10 +230,10 @@ function connectGlobalWebSocket() {
                 break;
             case 'call_ended':
                 gHandleRemoteEndCall(data);
-                hideIncomingCallGlobal();
+                if (!onChatPage) hideIncomingCallGlobal();
                 break;
             case 'call_rejected':
-                hideIncomingCallGlobal();
+                if (!onChatPage) hideIncomingCallGlobal();
                 gHandleCallEnded();
                 break;
             case 'call_offer_renegotiate':
@@ -234,12 +243,13 @@ function connectGlobalWebSocket() {
                 gHandleRenegotiateAnswer(data);
                 break;
         }
-    };
+    });
 }
 
 function sendGlobalWsMessage(msg) {
-    if (globalSocket && globalSocket.readyState === WebSocket.OPEN) {
-        globalSocket.send(JSON.stringify(msg));
+    var ws = window.__callWs || globalSocket;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(msg));
     }
 }
 

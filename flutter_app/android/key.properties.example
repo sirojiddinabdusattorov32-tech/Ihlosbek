@@ -1,4 +1,0 @@
-storeFile=../avtosotuv-keystore.jks
-storePassword=your-store-password
-keyAlias=upload
-keyPassword=your-key-password

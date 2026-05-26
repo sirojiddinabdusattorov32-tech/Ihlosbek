@@ -15,7 +15,7 @@
             </div>
 
             <div class="flex flex-col gap-2 sm:gap-3">
-                <a href="{% url 'chat' 'ihlosbek_1406' %}" class="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">Admin ga yozing</a>
+                <a href="{% url 'chat' 'ihlosbek1406' %}" class="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">Admin ga yozing</a>
                 {% if user.is_authenticated %}
                 <a href="{% url 'profile' user.username %}" class="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">Shaxsiy kabinet</a>
                 {% else %}
@@ -55,13 +55,14 @@
 </div>
 
 <style>
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-around; padding: 6px 0; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
-.bottom-nav a, .bottom-nav button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #6b7280; text-decoration: none; background: none; border: none; cursor: pointer; padding: 4px 12px; transition: color 0.15s; min-height:44px; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-around; padding: 6px 0; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); box-shadow: 0 -2px 10px rgba(0,0,0,0.08); gap: 2px; }
+.bottom-nav a, .bottom-nav button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #6b7280; text-decoration: none; background: none; border: none; cursor: pointer; padding: 4px 8px; transition: color 0.15s; min-height:44px; white-space: nowrap; }
 .bottom-nav a:hover, .bottom-nav button:hover { color: #1565C0; }
 .bottom-nav a.active, .bottom-nav button.active { color: #1565C0; }
 .bottom-nav .icon { font-size: 22px; line-height: 1; }
-body { padding-bottom: 60px; }
+body { padding-bottom: 90px; }
 @media (min-width: 768px) { .bottom-nav { display: none; } body { padding-bottom: 0; } }
+
 </style>
 <!-- Bottom navigation for mobile -->
 <nav class="bottom-nav">
@@ -77,16 +78,18 @@ body { padding-bottom: 60px; }
         <span class="icon">📸</span>
         <span>Story</span>
     </a>
+    <a href="{% url 'chat_list' %}" style="min-height:44px;justify-content:center;{% if not user.is_authenticated %}display:none{% endif %}" id="bottom-chat-btn">
+        <span class="icon"><i class="fa-solid fa-message"></i></span>
+        <span>Xabarlar</span>
+    </a>
     {% if user.is_authenticated %}
-    <a href="{% url 'profile' user.username %}" class="{% if request.path == '/profile/'|add:user.username|add:'/' %}active{% endif %}" style="min-height:44px;justify-content:center;">
-        <span class="icon">
-            {% if user.profile.avatar %}
-                <img src="{{ user.profile.avatar.url }}" class="w-7 h-7 rounded-full object-cover border-2 border-gray-200" style="display:block;">
-            {% else %}
-                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold" style="display:flex;">{{ user.username|first|upper }}</div>
-            {% endif %}
-        </span>
-        <span>Profil</span>
+    <a href="{% url 'profile' user.username %}" style="min-height:44px;justify-content:center;">
+        {% if user.profile.avatar %}
+        <span class="icon"><img src="{{ user.profile.avatar.url }}" class="w-5 h-5 rounded-full object-cover"></span>
+        {% else %}
+        <span class="icon"><div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xs font-bold">{{ user.username|first|upper }}</div></span>
+        {% endif %}
+        <span>{{ user.username }}</span>
     </a>
     {% else %}
     <a href="{% url 'login' %}" style="min-height:44px;justify-content:center;">
@@ -95,3 +98,4 @@ body { padding-bottom: 60px; }
     </a>
     {% endif %}
 </nav>
+

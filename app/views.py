@@ -4,19 +4,19 @@ import json
 import os
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q, Count, Prefetch
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, never_cache
 from .models import Car, Profile, Message, Product, Story, Notification, VILOYATLAR, DownloadHistory
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -59,7 +59,7 @@ def spotify_search_api(request):
         return Response({'error': 'Query required'}, status=400)
     token = get_spotify_token()
     if not token:
-        return Response({'error': 'Spotify sozlanmagan. SPOTIFY_CLIENT_ID va SPOTIFY_CLIENT_SECRET ni o\'rnating.'}, status=503)
+        return Response({'tracks': []})
     resp = requests.get('https://api.spotify.com/v1/search',
         params={'q': query, 'type': 'track', 'limit': 10},
         headers={'Authorization': f'Bearer {token}'})
@@ -337,6 +337,7 @@ def product_delete_view(request, pk):
     return JsonResponse({'ok': True})
 
 
+@never_cache
 def home(request):
     stats = cache.get('home_stats')
     if not stats:
@@ -479,29 +480,22 @@ def login_view(request):
 def forgot_password_view(request):
     if request.method == 'POST':
         nickname = request.POST.get('nickname', '').strip()
-        email = request.POST.get('email', '').strip()
-        if not nickname or not email:
-            return JsonResponse({'error': 'Nik-name va email kiriting!'}, status=400)
+        phone = request.POST.get('phone', '').strip()
+        if not nickname or not phone:
+            return JsonResponse({'error': 'Nik-name va telefon kiriting!'}, status=400)
         try:
             user = User.objects.get(username=nickname)
+            profile = user.profile
         except User.DoesNotExist:
             return JsonResponse({'error': 'Bunday nik-name topilmadi!'}, status=404)
-        if user.email != email:
-            return JsonResponse({'error': 'Bu email ushbu nik-name ga ulanmagan!'}, status=400)
+        if profile.phone != phone:
+            return JsonResponse({'error': 'Bu telefon ushbu nik-name ga ulanmagan!'}, status=400)
         new_password = str(random.randint(100000, 999999))
         user.set_password(new_password)
         user.save()
-        try:
-            send_mail(
-                subject='Parolingiz tiklandi',
-                message=f'Hurmatli {user.username},\n\nSizning yangi parolingiz: {new_password}\n\nIltimos, profilingizga kirgandan so\'ng parolni o\'zgartiring.',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                fail_silently=False,
-            )
-            return JsonResponse({'ok': True, 'message': 'Yangi parol emailingizga yuborildi!'})
-        except Exception as e:
-            return JsonResponse({'error': f'Email jo\'natishda xatolik: {str(e)}'}, status=500)
+        update_session_auth_hash(request, user)
+        print(f"\n[SMS] {phone} ga yangi parol: {new_password}\n")
+        return JsonResponse({'ok': True, 'message': f'Yangi parolingiz: {new_password}\n(SMS xizmati ulangandan keyin bu telefon nomerga keladi)'})
     return JsonResponse({'error': 'GET so\'rov qabul qilinmaydi'}, status=405)
 
 
@@ -512,6 +506,8 @@ def logout_view(request):
             profile.last_activity = None
             profile.save(update_fields=['last_activity'])
     logout(request)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.GET.get('ajax') or request.POST.get('ajax'):
+        return JsonResponse({'ok': True, 'logged_out': True})
     return redirect('index')
 
 
@@ -570,12 +566,16 @@ def ads_delete(request, pk):
 
 def profile_view(request, username):
     user = get_object_or_404(User.objects.select_related('profile'), username=username)
+
+    # ihlosbek1406 profili faqat o'ziga ko'rinadi
+    if user.username == 'ihlosbek1406' and (not request.user.is_authenticated or request.user.username != 'ihlosbek1406'):
+        return redirect('home')
+
     profile = user.profile
     sub_count = profile.subscribers.count()
     following_count = profile.following.count()
     products = Product.objects.filter(user=user)
-    admin_user = User.objects.filter(username='ihlosbek_1406').only('id').first()
-    admin_products = Product.objects.filter(user=admin_user) if admin_user else []
+    admin_products = []
     is_subscribed = False
     if request.user.is_authenticated and request.user != user:
         is_subscribed = request.user.profile in profile.subscribers.all()
@@ -611,6 +611,7 @@ def profile_edit(request):
                 messages.error(request, "Eski parol noto'g'ri!")
                 return render(request, 'profile_edit.html', {'profile': profile})
             request.user.set_password(password)
+            update_session_auth_hash(request, request.user)
         if full_name:
             request.user.first_name = full_name
         if nickname and nickname != request.user.username:
@@ -631,6 +632,21 @@ def profile_edit(request):
         messages.success(request, "Profil yangilandi!")
         return redirect('profile', username=request.user.username)
     return render(request, 'profile_edit.html', {'profile': profile})
+
+
+@require_POST
+def delete_account_view(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    password = request.POST.get('password', '')
+    if not request.user.check_password(password):
+        messages.error(request, "Eski parol noto'g'ri!")
+        return redirect('profile_edit')
+    username = request.user.username
+    request.user.delete()
+    logout(request)
+    messages.success(request, f"@{username} profili o'chirildi!")
+    return redirect('home')
 
 
 def subscribe_view(request, username):
@@ -672,10 +688,35 @@ def search_view(request):
     profiles = None
     products = None
     if q:
-        users = User.objects.filter(username__icontains=q)[:10]
+        users = User.objects.filter(username__icontains=q).exclude(username='ihlosbek1406')[:10]
         profiles = Profile.objects.filter(user__in=users)
         products = Product.objects.filter(name__icontains=q)[:20]
     return render(request, 'search.html', {'query': q, 'profiles': profiles, 'products': products})
+
+
+def search_api(request):
+    q = request.GET.get('q', '').strip()
+    data = {'profiles': [], 'products': []}
+    if q:
+        users = User.objects.filter(username__icontains=q).exclude(username='ihlosbek1406')[:10]
+        profiles = Profile.objects.filter(user__in=users)
+        for p in profiles:
+            data['profiles'].append({
+                'username': p.user.username,
+                'first_name': p.user.first_name,
+                'avatar': p.avatar.url if p.avatar else None,
+            })
+        products = Product.objects.filter(name__icontains=q)[:20]
+        for p in products:
+            data['products'].append({
+                'name': p.name,
+                'car_model': p.car_model or p.name,
+                'price': str(p.price) if p.price else None,
+                'mileage': p.mileage,
+                'username': p.user.username,
+                'image': p.image.url,
+            })
+    return JsonResponse(data)
 
 
 def notifications_api(request):
@@ -845,6 +886,43 @@ def react_message(request, msg_id):
         msg.save()
     return JsonResponse({'reaction': msg.reaction})
 
+def chat_list_view(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    chats = Message.objects.filter(
+        Q(sender=request.user) | Q(receiver=request.user)
+    ).values_list('sender', 'receiver').distinct()[:200]
+    user_ids = set()
+    for s, r in chats:
+        if s == request.user.pk:
+            user_ids.add(r)
+        else:
+            user_ids.add(s)
+    chat_users = []
+    for uid in user_ids:
+        try:
+            other = User.objects.get(pk=uid)
+        except User.DoesNotExist:
+            continue
+        last_msg = Message.objects.filter(
+            Q(sender=request.user, receiver=other) |
+            Q(sender=other, receiver=request.user)
+        ).order_by('-timestamp').first()
+        chat_users.append({
+            'user': other,
+            'profile': other.profile,
+            'last_message': last_msg.content[:100] if last_msg and last_msg.content else ('📎 Fayl' if last_msg and last_msg.file else ''),
+            'last_time': last_msg.timestamp if last_msg else None,
+        })
+    chat_users.sort(key=lambda c: c['last_time'] or timezone.datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    now = timezone.now()
+    return render(request, 'chat_list.html', {
+        'chat_users': chat_users,
+        'now': now,
+        'now_minus_15': now - timezone.timedelta(minutes=15),
+    })
+
+
 def download_apk(request):
     file_path = os.path.join(settings.BASE_DIR, 'downloads', 'avtosotuv-v1.0.0.apk')
     if not os.path.exists(file_path):
@@ -867,6 +945,26 @@ def download_apk(request):
     return response
 
 
+def download_shortcut(request):
+    site_url = 'http://127.0.0.1:8000/'
+    content = f'[InternetShortcut]\nURL={site_url}\n'
+    file_size = len(content.encode())
+    size_str = '1 KB'
+
+    DownloadHistory.objects.create(
+        user=request.user if request.user.is_authenticated else None,
+        file_name='avtosotuv.uz.url',
+        file_size=size_str,
+        platform='windows',
+        ip_address=request.META.get('REMOTE_ADDR'),
+    )
+
+    response = HttpResponse(content, content_type='application/internet-shortcut')
+    response['Content-Disposition'] = 'attachment; filename="avtosotuv.uz.url"'
+    response['Content-Length'] = file_size
+    return response
+
+
 def download_history_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -874,6 +972,7 @@ def download_history_view(request):
     return render(request, 'download_history.html', {'downloads': downloads})
 
 
+@never_cache
 def service_worker(request):
     file_path = os.path.join(settings.BASE_DIR, 'static', 'service-worker.js')
     with open(file_path, 'r') as f:

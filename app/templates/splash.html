@@ -1,167 +1,175 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>avtosotuv.uz</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body {
-            width: 100%; height: 100%;
-            overflow: hidden;
-        }
-        body {
-            background: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial, sans-serif;
-            padding: 16px;
-        }
+{% extends "index.html" %}
+{% load static %}
 
-        .welcome-text {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .welcome-text h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: #1565C0;
-            margin-bottom: 6px;
-        }
-        .welcome-text p {
-            font-size: 14px;
-            color: #6b7280;
-        }
+{% block title %}avtosotuv.uz{% endblock %}
 
+{% block body_class %}{% endblock %}
+{% block body_style %}max-width:none;padding:0;background:#fff;overflow:hidden;height:100%;{% endblock %}
+
+{% block redirect %}{% endblock %}
+{% block loading %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_style %}
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+        width: 100%; height: 100%;
+        overflow: hidden;
+    }
+    body {
+        background: #fff;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        padding: 16px;
+    }
+
+    .welcome-text {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .welcome-text h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1565C0;
+        margin-bottom: 6px;
+    }
+    .welcome-text p {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .wrap {
+        background: #0d2680;
+        border-radius: 22px;
+        border: 1.5px solid #1e3fae;
+        padding: 40px 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        min-height: 220px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        max-width: 100%;
+    }
+
+    .car-zone {
+        position: relative;
+        width: 210px;
+        height: 148px;
+        flex-shrink: 0;
+    }
+
+    canvas#lc {
+        position: absolute;
+        top: 0; left: 0;
+        width: 210px; height: 148px;
+        pointer-events: none;
+    }
+
+    svg#cs {
+        position: absolute;
+        top: 0; left: 0;
+        overflow: visible;
+    }
+
+    .right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .brand {
+        font-family: 'Arial Black', Arial, sans-serif;
+        font-size: 54px;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1;
+        letter-spacing: -2px;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(24px);
+    }
+
+    .brand span { color: #5bbfee; }
+
+    .tagline {
+        font-size: 12.5px;
+        letter-spacing: 5px;
+        color: #7dd3fc;
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    .uline {
+        height: 2px;
+        border-radius: 2px;
+        background: #3b82f6;
+        width: 0;
+        margin-top: 2px;
+    }
+
+    .hint {
+        position: absolute;
+        bottom: 9px; right: 14px;
+        font-size: 11px;
+        color: #3b82f6;
+        opacity: 0.55;
+    }
+
+    @media (max-width: 640px) {
+        .welcome-text h1 { font-size: 20px; }
+        .welcome-text p { font-size: 12px; }
         .wrap {
-            background: #0d2680;
-            border-radius: 22px;
-            border: 1.5px solid #1e3fae;
-            padding: 40px 52px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 28px;
-            min-height: 220px;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-            user-select: none;
-            max-width: 100%;
-        }
-
-        .car-zone {
-            position: relative;
-            width: 210px;
-            height: 148px;
-            flex-shrink: 0;
-        }
-
-        canvas#lc {
-            position: absolute;
-            top: 0; left: 0;
-            width: 210px; height: 148px;
-            pointer-events: none;
-        }
-
-        svg#cs {
-            position: absolute;
-            top: 0; left: 0;
-            overflow: visible;
-        }
-
-        .right {
-            display: flex;
+            padding: 20px 16px;
+            gap: 12px;
+            min-height: auto;
+            border-radius: 16px;
             flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
         }
-
-        .brand {
-            font-family: 'Arial Black', Arial, sans-serif;
-            font-size: 54px;
-            font-weight: 900;
-            color: #fff;
-            line-height: 1;
-            letter-spacing: -2px;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateX(24px);
+        .car-zone {
+            width: 168px;
+            height: 118px;
+            transform: scale(0.8);
+            transform-origin: center;
         }
+        canvas#lc { width: 168px; height: 118px; }
+        svg#cs { width: 168px; height: 118px; }
+        .brand { font-size: 32px; letter-spacing: -1px; }
+        .tagline { font-size: 10px; letter-spacing: 3px; }
+        .right { align-items: center; }
+    }
 
-        .brand span { color: #5bbfee; }
-
-        .tagline {
-            font-size: 12.5px;
-            letter-spacing: 5px;
-            color: #7dd3fc;
-            opacity: 0;
-            transform: translateY(8px);
+    @media (max-width: 400px) {
+        .welcome-text h1 { font-size: 17px; }
+        .welcome-text p { font-size: 11px; }
+        .wrap {
+            padding: 16px 12px;
+            gap: 8px;
+            border-radius: 14px;
         }
-
-        .uline {
-            height: 2px;
-            border-radius: 2px;
-            background: #3b82f6;
-            width: 0;
-            margin-top: 2px;
+        .car-zone {
+            width: 140px;
+            height: 98px;
+            transform: scale(0.7);
         }
+        canvas#lc { width: 140px; height: 98px; }
+        svg#cs { width: 140px; height: 98px; }
+        .brand { font-size: 26px; letter-spacing: -1px; }
+        .tagline { font-size: 8px; letter-spacing: 2px; }
+    }
+</style>
+{% endblock %}
 
-        .hint {
-            position: absolute;
-            bottom: 9px; right: 14px;
-            font-size: 11px;
-            color: #3b82f6;
-            opacity: 0.55;
-        }
-
-        @media (max-width: 640px) {
-            .welcome-text h1 { font-size: 20px; }
-            .welcome-text p { font-size: 12px; }
-            .wrap {
-                padding: 20px 16px;
-                gap: 12px;
-                min-height: auto;
-                border-radius: 16px;
-                flex-direction: column;
-            }
-            .car-zone {
-                width: 168px;
-                height: 118px;
-                transform: scale(0.8);
-                transform-origin: center;
-            }
-            canvas#lc { width: 168px; height: 118px; }
-            svg#cs { width: 168px; height: 118px; }
-            .brand { font-size: 32px; letter-spacing: -1px; }
-            .tagline { font-size: 10px; letter-spacing: 3px; }
-            .right { align-items: center; }
-        }
-
-        @media (max-width: 400px) {
-            .welcome-text h1 { font-size: 17px; }
-            .welcome-text p { font-size: 11px; }
-            .wrap {
-                padding: 16px 12px;
-                gap: 8px;
-                border-radius: 14px;
-            }
-            .car-zone {
-                width: 140px;
-                height: 98px;
-                transform: scale(0.7);
-            }
-            canvas#lc { width: 140px; height: 98px; }
-            svg#cs { width: 140px; height: 98px; }
-            .brand { font-size: 26px; letter-spacing: -1px; }
-            .tagline { font-size: 8px; letter-spacing: 2px; }
-        }
-    </style>
-</head>
-<body>
+{% block content %}
 
 <div class="welcome-text">
     <h1>Avto sotuvga hush kelibsiz!</h1>
@@ -336,5 +344,4 @@
   wrap.addEventListener('click', start);
   start();
 </script>
-</body>
-</html>
+{% endblock %}

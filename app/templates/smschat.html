@@ -1,41 +1,46 @@
+{% extends "index.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ other.username }} bilan suhbat</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        body { padding-bottom: 0 !important; }
-        @media (max-width: 480px) {
-            #chat-messages .max-w-xs { max-width: 88% !important; }
-            #chat-messages .max-w-\[85\%\] { max-width: 88% !important; }
-            #chat-form input { font-size: 16px !important; }
-            #chat-form button { min-width: 44px; min-height: 44px; }
-            .emoji-grid button { font-size: 1.5rem !important; padding: 6px !important; }
-            #emoji-picker { max-height: 200px !important; }
-            #emoji-picker .grid { grid-template-columns: repeat(7, 1fr) !important; gap: 2px !important; }
-            #incoming-call-overlay .w-80 { width: 90% !important; max-width: 320px; }
-            #call-ended-overlay .w-80 { width: 90% !important; max-width: 320px; }
-            #recording-overlay .w-80 { width: 90% !important; }
-            #recording-overlay .flex-wrap { flex-wrap: wrap; gap: 8px; }
-            #recording-overlay button { min-width: 80px; }
-            #main-chat .gap-2 { gap: 6px !important; }
-            #main-chat .gap-3 { gap: 8px !important; }
-        }
-        @media (max-width: 360px) {
-            #chat-messages .max-w-xs { max-width: 92% !important; }
-            #chat-messages .max-w-\[85\%\] { max-width: 92% !important; }
-            #chat-messages .px-3 { padding-left: 8px !important; padding-right: 8px !important; }
-            #chat-form .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
-            #main-chat .px-4 { padding-left: 6px !important; padding-right: 6px !important; }
-        }
-    </style>
-</head>
-<body class="bg-gray-100 font-sans h-screen flex flex-col overflow-hidden" style="font-family: 'Manrope', sans-serif;">
+
+{% block title %}{{ other.username }} bilan suhbat — avtosotuv.uz{% endblock %}
+
+{% block body_class %} bg-gray-100 h-screen overflow-hidden{% endblock %}
+{% block body_style %}max-width:none;padding:0;font-family: 'Manrope', sans-serif;{% endblock %}
+
+{% block redirect %}{% endblock %}
+{% block loading %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_style %}
+<style>
+    body { padding-bottom: 0 !important; }
+    @media (max-width: 480px) {
+        #chat-messages .max-w-xs { max-width: 88% !important; }
+        #chat-messages .max-w-\[85\%\] { max-width: 88% !important; }
+        #chat-form { gap: 4px !important; padding-left: 6px !important; padding-right: 6px !important; }
+        #chat-form input { font-size: 16px !important; padding-left: 10px !important; padding-right: 10px !important; }
+        #chat-form button { min-width: 40px; min-height: 40px; }
+        .emoji-grid button { font-size: 1.5rem !important; padding: 6px !important; }
+        #emoji-picker { max-height: 200px !important; }
+        #emoji-picker .grid { grid-template-columns: repeat(7, 1fr) !important; gap: 2px !important; }
+        #incoming-call-overlay .w-80 { width: 90% !important; max-width: 320px; }
+        #call-ended-overlay .w-80 { width: 90% !important; max-width: 320px; }
+        #recording-overlay .w-80 { width: 90% !important; }
+        #recording-overlay .flex-wrap { flex-wrap: wrap; gap: 8px; }
+        #recording-overlay button { min-width: 80px; }
+        #main-chat .gap-2 { gap: 6px !important; }
+        #main-chat .gap-3 { gap: 8px !important; }
+    }
+    @media (max-width: 360px) {
+        #chat-messages .max-w-xs { max-width: 92% !important; }
+        #chat-messages .max-w-\[85\%\] { max-width: 92% !important; }
+        #chat-messages .px-3 { padding-left: 8px !important; padding-right: 8px !important; }
+        #chat-form .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
+        #main-chat .px-4 { padding-left: 6px !important; padding-right: 6px !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
 
 <div id="call-overlay" class="fixed inset-0 bg-black z-50 hidden flex-col">
     <div id="remote-video" class="flex-1 bg-black relative flex items-center justify-center">
@@ -259,6 +264,8 @@
         </button>
     </form>
 </div>
+
+
 
 <script>
 var EMOJIS = [
@@ -536,19 +543,25 @@ document.addEventListener('click', function(e) {
     }
 
     function connectWebSocket() {
+        if (window.__callWs && (window.__callWs.readyState === WebSocket.OPEN || window.__callWs.readyState === WebSocket.CONNECTING)) {
+            callSocket = window.__callWs;
+            wsConnected = true;
+            return;
+        }
         if (callSocket && (callSocket.readyState === WebSocket.OPEN || callSocket.readyState === WebSocket.CONNECTING)) return;
         callSocket = new WebSocket(getWebSocketUrl());
-        callSocket.onopen = function() {
+        window.__callWs = callSocket;
+        callSocket.addEventListener('open', function() {
             wsConnected = true;
             if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
-        };
-        callSocket.onclose = function() {
+        });
+        callSocket.addEventListener('close', function() {
             wsConnected = false;
             if (!wsReconnectTimer) {
                 wsReconnectTimer = setTimeout(function() { connectWebSocket(); }, 3000);
             }
-        };
-        callSocket.onmessage = function(event) {
+        });
+        callSocket.addEventListener('message', function(event) {
             var data = JSON.parse(event.data);
             switch (data.type) {
                 case 'incoming_call':
@@ -576,12 +589,13 @@ document.addEventListener('click', function(e) {
                     handleRenegotiateAnswer(data);
                     break;
             }
-        };
+        });
     }
 
     function sendWsMessage(msg) {
-        if (callSocket && callSocket.readyState === WebSocket.OPEN) {
-            callSocket.send(JSON.stringify(msg));
+        var ws = window.__callWs || callSocket;
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(msg));
         }
     }
 
@@ -1033,7 +1047,4 @@ document.addEventListener('click', function(e) {
 
     connectWebSocket();
 </script>
-{% include 'partials/story_viewer_global.html' %}
-{% include 'partials/futer.html' %}
-</body>
-</html>
+{% endblock %}

@@ -1,14 +1,12 @@
+{% extends "index.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if product %}Mahsulotni tahrirlash{% else %}Mahsulot qo'shish{% endif %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-50 font-sans min-h-screen" style="font-family: 'Manrope', sans-serif;">
+
+{% block title %}{% if product %}Mahsulotni tahrirlash{% else %}Mahsulot qo'shish{% endif %}{% endblock %}
+
+{% block redirect %}{% endblock %}
+{% block loading %}{% endblock %}
+
+{% block content %}
 {% include 'partials/navbar.html' %}
     <div class="max-w-2xl mx-auto px-4 py-8">
         <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-8">
@@ -55,6 +53,4 @@
             </form>
         </div>
     </div>
-{% include 'partials/futer.html' %}
-</body>
-</html>
+{% endblock %}

@@ -3,12 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avtosotuv</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}Avtosotuv{% endblock %}</title>
     <link rel="icon" href="{% static 'icon-192.png' %}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12.1.4/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="manifest" href="/static/manifest.json">
@@ -16,16 +15,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Avtosotuv">
     <link rel="apple-touch-icon" href="/static/icon-192.png">
-
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=5">
+    {% block extra_head %}{% endblock %}
 </head>
 <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
-    body{
-        background-color: #21084C;
-        text-align: center;
-        font-family: sans-serif;
-        color: white;
+    body {
+        background-color: #f5f5f5;
+        font-family: 'Manrope', sans-serif;
+        color: #1f2937;
         touch-action: manipulation;
         padding-bottom: max(60px, env(safe-area-inset-bottom, 0px));
         overflow-x: hidden;
@@ -37,7 +36,6 @@
     .swiper { overflow: hidden !important; max-width: 100% !important; }
     .swiper-button-next, .swiper-button-prev { display: none; }
     @media (min-width: 768px) { .swiper-button-next, .swiper-button-prev { display: flex; } }
-
     .product-card { max-width: 100%; }
     #storiesRing, [class*="overflow-x-auto"] { -webkit-overflow-scrolling: touch; }
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-around; padding: 6px 0; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
@@ -112,7 +110,8 @@
       .product-header .avatar, .product-header .avatar-letter { width: 22px !important; height: 22px !important; font-size: 10px !important; }
     }
 </style>
-<body class="bg-gray-50 font-sans text-gray-900 w-full mx-auto min-h-screen flex flex-col" style="max-width:1280px;padding:0 8px;">
+{% block extra_style %}{% endblock %}
+<body class="w-full mx-auto min-h-screen flex flex-col{% block body_class %}{% endblock %}" style="max-width:1280px;padding:0 8px;{% block body_style %}{% endblock %}">
 
 {% block redirect %}
     <script>
@@ -144,8 +143,9 @@ if ('serviceWorker' in navigator) {
 
 {% include 'partials/story_viewer_global.html' %}
 
-{% if not hide_footer %}
+{% block footer %}
 {% include 'partials/futer.html' %}
-{% endif %}
+{% endblock %}
+{% block extra_script %}{% endblock %}
 </body>
 </html>

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from app.views import index, home, register_view, login_view, logout_view, verify_view, ads_view, ads_edit, ads_delete, profile_view, profile_edit, subscribe_view, subscribers_list, following_list, search_view, chat_view, notifications_api, mark_notifications_read, chat_list_api, delete_message, react_message, product_list_api, story_list_api, story_upload, product_create, product_like_api, story_view_api, story_like_api, story_delete_api, spotify_search_api, story_music_edit, product_add_view, product_edit_view, product_delete_view, download_apk, download_history_view, forgot_password_view, set_language, service_worker, manifest_json
+from app.views import index, home, register_view, login_view, logout_view, verify_view, ads_view, ads_edit, ads_delete, profile_view, profile_edit, delete_account_view, subscribe_view, subscribers_list, following_list, search_view, search_api, chat_view, notifications_api, mark_notifications_read, chat_list_api, chat_list_view, delete_message, react_message, product_list_api, story_list_api, story_upload, product_create, product_like_api, story_view_api, story_like_api, story_delete_api, spotify_search_api, story_music_edit, product_add_view, product_edit_view, product_delete_view, download_apk, download_shortcut, download_history_view, forgot_password_view, set_language, service_worker, manifest_json
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -19,15 +19,18 @@ urlpatterns = [
     path('ads/edit/<int:pk>/', ads_edit, name='ads_edit'),
     path('ads/delete/<int:pk>/', ads_delete, name='ads_delete'),
     path('profile/edit/', profile_edit, name='profile_edit'),
+    path('profile/delete/', delete_account_view, name='delete_account'),
     path('profile/<str:username>/', profile_view, name='profile'),
     path('subscribe/<str:username>/', subscribe_view, name='subscribe'),
     path('subscribers/<str:username>/', subscribers_list, name='subscribers'),
     path('following/<str:username>/', following_list, name='following'),
     path('search/', search_view, name='search'),
+    path('search/api/', search_api, name='search_api'),
     path('chat/<str:username>/', chat_view, name='chat'),
     path('notifications/', notifications_api, name='notifications'),
     path('notifications/read/', mark_notifications_read, name='mark_notifications_read'),
-    path('chat-list/', chat_list_api, name='chat_list'),
+    path('chat-list/', chat_list_api, name='chat_list_api'),
+    path('messages/', chat_list_view, name='chat_list'),
     path('msg/delete/<int:msg_id>/', delete_message, name='delete_message'),
     path('msg/react/<int:msg_id>/', react_message, name='react_message'),
     path('api/products/', product_list_api, name='product_list_api'),
@@ -44,6 +47,7 @@ urlpatterns = [
     path('story/<int:pk>/music/edit/', story_music_edit, name='story_music_edit'),
     path('api/spotify/search/', spotify_search_api, name='spotify_search'),
     path('download/apk/', download_apk, name='download_apk'),
+    path('download/shortcut/', download_shortcut, name='download_shortcut'),
     path('download/history/', download_history_view, name='download_history'),
     path('set-language/', set_language, name='set_language'),
     path('service-worker.js', service_worker, name='service_worker'),

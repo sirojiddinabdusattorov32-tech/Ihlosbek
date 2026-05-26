@@ -1,14 +1,13 @@
+{% extends "index.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reklamani o'chirish</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-50 font-sans min-h-screen flex items-center justify-center px-4" style="font-family: 'Manrope', sans-serif;">
+
+{% block title %}Reklamani o'chirish — avtosotuv.uz{% endblock %}
+
+{% block redirect %}{% endblock %}
+{% block loading %}{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex items-center justify-center px-4 py-12">
     <div class="bg-white rounded-2xl shadow-lg w-full max-w-sm p-8 text-center">
         <div class="text-5xl mb-4">&#x26A0;&#xFE0F;</div>
         <h2 class="text-xl font-bold text-gray-900 mb-2">Reklamani o'chirish</h2>
@@ -21,6 +20,5 @@
             </div>
         </form>
     </div>
-{% include 'partials/futer.html' %}
-</body>
-</html>
+</div>
+{% endblock %}

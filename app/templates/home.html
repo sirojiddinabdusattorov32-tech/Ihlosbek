@@ -12,6 +12,9 @@
     .story-ring.no-story { background: #ddd; }
     .story-ring img, .story-ring .letter { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid white; }
     .story-ring .letter { display: flex; align-items: center; justify-content: center; background: #e0e0e0; color: #666; font-weight: 700; font-size: 18px; }
+    .product-grid { display: grid; gap: 6px; grid-template-columns: repeat(2, 180px); }
+    @media (min-width: 640px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
     .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.06); transition: box-shadow 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .product-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
     .product-card:active { opacity: 0.95; }
@@ -24,6 +27,7 @@
     .product-body { padding: 8px 10px; }
     .product-body .title { font-weight: 600; font-size: 12px; color: #333; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .product-body .desc { font-size: 11px; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
     .fab-plus { position: fixed; bottom: 100px; right: 20px; width: 56px; height: 56px; background: #1565C0; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 16px rgba(21,101,192,0.4); cursor: pointer; z-index: 100; transition: transform 0.2s; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
     .fab-plus:hover { transform: scale(1.1); }
     .fab-plus:active { transform: scale(0.95); }
@@ -37,6 +41,7 @@
     .camera-overlay .close-camera { position: absolute; top: 16px; left: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; border: none; font-size: 20px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
     .camera-overlay .switch-cam { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; border: none; font-size: 18px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
     .camera-overlay .gallery-btn { background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 24px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .camera-overlay .icon-btn { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); color: white; border: none; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .camera-overlay .timer { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 18px; font-weight: 600; z-index: 10; text-shadow: 0 2px 8px rgba(0,0,0,0.5); display: none; }
     .story-viewer { position: fixed; inset: 0; background: black; z-index: 300; display: none; flex-direction: column; }
     .story-viewer .story-header { position: absolute; top: 0; left: 0; right: 0; padding: 16px; display: flex; align-items: center; gap: 10px; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); }
@@ -96,26 +101,6 @@
       .music-search-header { padding: 10px; }
       .music-track-item img { width: 36px; height: 36px; }
     }
-    .product-card { max-width: 100%; }
-    @media (max-width: 640px) { .product-card { width: 26% !important; height: 26% !important; } }
-    .product-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-    .product-card .product-body { overflow: hidden; }
-    @media (max-width: 640px) {
-      .grid-cols-2 .product-card { border-radius: 6px !important; }
-      .grid-cols-2 .product-card .product-header { padding: 4px 6px !important; gap: 4px !important; }
-      .grid-cols-2 .product-card .product-header .avatar,
-      .grid-cols-2 .product-card .product-header .avatar-letter { width: 20px !important; height: 20px !important; font-size: 9px !important; }
-      .grid-cols-2 .product-card .product-header .info .name { font-size: 10px !important; }
-      .grid-cols-2 .product-card .product-body { padding: 4px 6px !important; }
-      .grid-cols-2 .product-card .product-body .title { font-size: 11px !important; margin-bottom: 1px !important; }
-      .grid-cols-2 .product-card .product-body .desc { display: -webkit-box !important; font-size: 11px !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
-      .grid-cols-2 .product-card .product-body [style*="font-size:13px"] { font-size: 12px !important; }
-      .grid-cols-2 .product-card .product-body [style*="font-size:11px"] { font-size: 11px !important; }
-      .grid-cols-2 .product-card .product-body [style*="font-size:10px"] { font-size: 10px !important; display: block !important; }
-      .grid-cols-2 .product-card .like-btn { font-size: 14px !important; }
-      .grid-cols-2 .product-card .like-count { font-size: 11px !important; }
-      .grid-cols-2 .product-card .product-header .info [style*="font-size:10px"] { font-size: 10px !important; display: block !important; }
-    }
 </style>
 
 {% include 'partials/navbar.html' %}
@@ -124,7 +109,7 @@
 
     <!-- STORIES RINGS -->
     <div class="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide mb-4 sm:mb-6 px-1 sm:px-2" id="storiesRing">
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and user.username != 'ihlosbek1406' %}
         <div class="relative flex-shrink-0" style="width:56px;" id="myStoryRing">
             <div class="story-ring no-story relative" id="myStoryRingBorder" onclick="viewGlobalStory('{{ user.username }}')">
                 {% if user.profile.avatar %}
@@ -147,14 +132,12 @@
       <div class="swiper-pagination"></div>
     </div>
 
-    {% if user.is_authenticated and user.username == 'ihlosbek_1406' %}
-    <div class="flex justify-center -mt-3 mb-6">
-      <a href="{% url 'ads' %}" class="flex items-center gap-2 bg-transparent text-blue-600 px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-50 transition-colors border-2 border-blue-600">
+    <div id="sotish-btn-wrap" class="flex justify-center mb-6" style="display:none;">
+      <a href="{% url 'ads' %}" class="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors border-2 border-blue-600 shadow-lg">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
         Sotish
       </a>
     </div>
-    {% endif %}
 
     <!-- REGION FILTER -->
     <div class="relative mb-3 px-1">
@@ -173,18 +156,17 @@
 <!-- CAMERA OVERLAY -->
 <div class="camera-overlay" id="cameraOverlay">
     <button class="close-camera" onclick="closeCamera()">&larr;</button>
-    <button class="switch-cam" onclick="switchCamera()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z"/><circle cx="12" cy="13" r="4"/></svg>
-    </button>
     <div class="timer" id="recordTimer">00:00</div>
     <video id="cameraPreview" autoplay playsinline muted></video>
-    <div class="controls" style="flex-direction:column;gap:16px;bottom:30px;">
+    <div class="controls" style="flex-direction:row;justify-content:space-between;bottom:80px;padding:0 40px;">
+        <button class="gallery-btn icon-btn" onclick="document.getElementById('galleryInput').click()">
+            <i class="fa-regular fa-image"></i>
+        </button>
         <button class="capture-btn" id="captureBtn" onmousedown="startCapture()" ontouchstart="startCapture()" onmouseup="stopCapture()" ontouchend="stopCapture()" onmouseleave="stopCapture()">
             <div class="capture-btn-inner"></div>
         </button>
-        <button class="gallery-btn" onclick="document.getElementById('galleryInput').click()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            Galereyadan tanlash
+        <button class="flip-btn icon-btn" onclick="switchCamera()" title="Kamerani almashtirish">
+            <i class="fa-solid fa-camera-rotate"></i>
         </button>
         <input type="file" id="galleryInput" accept="image/*,video/*" style="display:none" onchange="uploadFromGallery(this)">
     </div>
@@ -254,49 +236,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@12.1.4/swiper-bundle.min.js"></script>
 <script>
-    // ===== SWIPER CAROUSEL (cars + products) =====
-    Promise.all([
-      fetch('/api/cars/').then(function(r) { return r.json(); }),
-      fetch('/api/products/').then(function(r) { return r.json(); })
-    ]).then(function(results) {
-      var cars = results[0] || [];
-      var products = results[1] || [];
-      var allSlides = [];
-      cars.forEach(function(car) {
-        var locHtml = '';
-        if (car.location) {
-          var parts = car.location.split(',').map(Number);
-          if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-            locHtml = '<a href="https://www.google.com/maps?q=' + parts[0] + ',' + parts[1] + '" target="_blank" class="hover:text-blue-300">📍 Joylashuvimiz</a>';
+    // ===== SWIPER CAROUSEL (only cars) =====
+    fetch('/api/cars/')
+      .then(function(r) { return r.json(); })
+      .then(function(cars) {
+        cars = cars || [];
+        var allSlides = [];
+        cars.forEach(function(car) {
+          var locHtml = '';
+          if (car.location) {
+            var parts = car.location.split(',').map(Number);
+            if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+              locHtml = '<a href="https://www.google.com/maps?q=' + parts[0] + ',' + parts[1] + '" target="_blank" class="hover:text-blue-300">📍 Joylashuvimiz</a>';
+            }
           }
-        }
-        var phoneHtml = car.phone2 ? '📞 ' + car.phone + ' | ' + car.phone2 : '📞 ' + car.phone;
-        allSlides.push(
-          '<div class="swiper-slide" style="background-image:url(\'' + car.image + '\')">' +
-            '<div class="overlay"><span>' + car.name + '</span>' + locHtml + '<span>' + phoneHtml + '</span></div></div>'
-        );
+          var phoneHtml = car.phone2 ? '📞 ' + car.phone + ' | ' + car.phone2 : '📞 ' + car.phone;
+          allSlides.push(
+            '<div class="swiper-slide" style="background-image:url(\'' + car.image + '\')">' +
+              '<div class="overlay"><span>' + car.name + '</span>' + locHtml + '<span>' + phoneHtml + '</span></div></div>'
+          );
+        });
+        var wrapper = document.getElementById('swiper-wrapper');
+        if (!wrapper) return;
+        if (allSlides.length === 0) { wrapper.parentElement.style.display = 'none'; return; }
+        wrapper.innerHTML = allSlides.join('');
+        new Swiper('.swiper', {
+          navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+          pagination: { el: '.swiper-pagination', clickable: true },
+          loop: allSlides.length > 1,
+          autoplay: { delay: 3000 },
+        });
       });
-      products.forEach(function(p) {
-        var user = p.user.first_name || p.user.username;
-        var infoParts = [p.name];
-        if (p.mileage) infoParts.push('⏱ ' + p.mileage);
-        if (p.color) infoParts.push('🎨 Kraska: ' + p.color);
-        allSlides.push(
-          '<div class="swiper-slide" style="background-image:url(\'' + p.image + '\')">' +
-            '<div class="overlay"><span>' + infoParts.join(' ') + '</span><span>👤 ' + user + '</span><a href="/chat/' + p.user.username + '/" class="buy-btn">Sotish</a></div></div>'
-        );
-      });
-      var wrapper = document.getElementById('swiper-wrapper');
-      if (!wrapper) return;
-      if (allSlides.length === 0) { wrapper.parentElement.style.display = 'none'; return; }
-      wrapper.innerHTML = allSlides.join('');
-      new Swiper('.swiper', {
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        pagination: { el: '.swiper-pagination', clickable: true },
-        loop: allSlides.length > 1,
-        autoplay: { delay: 3000 },
-      });
-    });
 
     // ===== SEARCH =====
     function searchProfile(e) {
@@ -308,7 +278,7 @@
     function searchProduct(e) {
         if (e.key === 'Enter') {
             var q = document.getElementById('productSearch').value.trim().toLowerCase();
-            var cards = document.querySelectorAll('.product-card');
+            var cards = document.querySelectorAll('.product-grid > div');
             cards.forEach(function(c) {
                 var title = (c.querySelector('.title') || {}).textContent || '';
                 c.style.display = title.toLowerCase().includes(q) ? '' : 'none';
@@ -408,54 +378,33 @@
                     return;
                 }
                 var html = '';
-                var renderProductCard = function(p) {
-                    var avatarHtml, letter = (p.user.first_name || p.user.username).charAt(0).toUpperCase();
-                    var storyBorder = '';
-                    if (p.poster_has_stories) {
-                        storyBorder = p.poster_has_unviewed ? 'style="padding:2px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-radius:50%;display:inline-block;"' : 'style="padding:2px;background:#ddd;border-radius:50%;display:inline-block;"';
-                    }
-                    if (p.user.avatar) {
-                        var imgHtml = '<img class="avatar" src="' + p.user.avatar + '" alt="" data-username="' + p.user.username + '" oncontextmenu="enlargeAvatar(this.src);return false" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid white;display:block;cursor:pointer;">';
-                        avatarHtml = storyBorder ? '<div ' + storyBorder + '>' + imgHtml + '</div>' : imgHtml;
-                    } else {
-                        var letterHtml = '<div class="avatar-letter" data-username="' + p.user.username + '" oncontextmenu="return false" style="width:28px;height:28px;font-size:12px;">' + letter + '</div>';
-                        avatarHtml = storyBorder ? '<div ' + storyBorder + '>' + letterHtml + '</div>' : letterHtml;
-                    }
+                    var renderProductCard = function(p) {
                     var likeIcon = p.is_liked ? '❤️' : '🤍';
-                    var showName = (p.name !== p.car_model) ? '<div class="title" style="font-size:12px;margin-bottom:2px;">' + p.name + '</div>' : '';
-                    var priceParts = [];
-                    if (p.price) priceParts.push('<span style="font-weight:700;color:#1565C0;">' + p.price + '</span>');
-                    if (p.mileage) priceParts.push('<span style="color:#999;font-size:11px;">⏱ ' + p.mileage + '</span>');
-                    var priceHtml = priceParts.length ? '<div style="font-size:13px;margin:2px 0;">' + priceParts.join(' &nbsp;|&nbsp; ') + '</div>' : '';
-                    var carModelHtml = p.car_model ? '<div style="font-size:11px;color:#333;font-weight:600;">🚗 ' + p.car_model + '</div>' : '';
-                    var colorHtml = p.color ? '<div style="font-size:10px;color:#999;">🎨 Kraska: ' + p.color + '</div>' : '';
-                    var phoneHtml = p.user.phone ? '<div style="font-size:10px;color:#999;">📞 ' + p.user.phone + '</div>' : '';
-                    var regionHtml = p.user.region ? '<div style="font-size:10px;color:#999;">📍 ' + p.user.region + '</div>' : '';
-                    return '<div class="product-card" style="text-align:left;">' +
-                                '<div class="product-header" onclick="location.href=\'/chat/' + p.user.username + '/\'" style="padding:8px 10px;gap:6px;">' +
-                                    avatarHtml +
-                                    '<div class="info">' +
-                                        '<div class="name" onclick="event.stopPropagation();location.href=\'/profile/' + p.user.username + '/\'" style="font-size:12px;">' + (p.user.first_name || p.user.username) + '</div>' +
-                                        regionHtml +
-                                    '</div>' +
-                                '</div>' +
-                                '<img class="product-image" src="' + p.image + '" alt="' + p.name + '" onclick="location.href=\'/chat/' + p.user.username + '/\'">' +
-                                '<div class="product-body" style="padding:8px 10px;">' +
-                                    showName +
-                                    priceHtml +
-                                    carModelHtml +
-                                    colorHtml +
-                                    phoneHtml +
-                                    (p.description ? '<div class="desc" style="font-size:11px;">' + p.description + '</div>' : '') +
-                                    '<div style="display:flex;align-items:center;gap:4px;margin-top:4px;">' +
-                                        '<span class="like-btn" style="font-size:14px;" onclick="toggleLike(' + p.id + ', this)">' + likeIcon + '</span>' +
-                                        (p.like_count > 0 ? '<span class="like-count" onclick="showProductLikers(' + p.id + ')" style="font-size:11px;color:#666;cursor:pointer;font-weight:600;">' + p.like_count + '</span>' : '') +
+                    var priceHtml = '';
+                    if (p.price) priceHtml += '<span class="font-bold text-blue-600">' + p.price + '</span>';
+                    if (p.price && p.mileage) priceHtml += '<span class="text-gray-400 mx-1">|</span>';
+                    if (p.mileage) priceHtml += '<span class="text-xs text-gray-500">⏱ ' + p.mileage + '</span>';
+                    var region = p.user.region || '';
+                    return '<div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition">' +
+                                '<a href="/chat/' + p.user.username + '/">' +
+                                    '<img src="' + p.image + '" class="w-full aspect-square object-cover" alt="' + p.name + '">' +
+                                '</a>' +
+                                '<div class="p-3">' +
+                                    '<a href="/chat/' + p.user.username + '" class="font-semibold text-sm text-gray-900 no-underline block truncate">🚗 ' + (p.car_model || p.name) + '</a>' +
+                                    '<div class="text-sm mt-1">' + priceHtml + '</div>' +
+                                    (p.color ? '<div class="text-xs text-gray-500 mt-1">🎨 Kraska: ' + p.color + '</div>' : '') +
+                                    '<div class="text-xs text-gray-500 mt-1">📞' + (p.user.phone || '') + '</div>' +
+                                    (region ? '<div class="text-xs text-gray-500 mt-1">📍 ' + region + '</div>' : '') +
+                                    (p.description ? '<div class="text-xs text-gray-500 mt-1">' + p.description + '</div>' : '') +
+                                    '<div class="flex items-center gap-1 mt-2">' +
+                                        '<span class="cursor-pointer text-sm" onclick="toggleLike(' + p.id + ', this)">' + likeIcon + '</span>' +
+                                        (p.like_count > 0 ? '<span onclick="showProductLikers(' + p.id + ')" class="text-xs text-gray-400 cursor-pointer font-semibold">' + p.like_count + '</span>' : '') +
                                     '</div>' +
                                 '</div>' +
                             '</div>';
                 };
                 if (data.length > 0) {
-                    html += '<h2 class="text-lg font-bold text-gray-900 mb-3">Mahsulotlar</h2><div class="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">';
+                    html += '<h2 class="text-lg font-bold text-gray-900 mb-3">Mahsulotlar</h2><div class="product-grid">';
                     data.forEach(function(p) { html += renderProductCard(p); });
                     html += '</div>';
                 }
@@ -466,6 +415,7 @@
 
     // ===== STORIES RING =====
     var currentUsername = '{% if user.is_authenticated %}{{ user.username }}{% endif %}';
+    if (currentUsername === 'ihlosbek1406') { document.getElementById('sotish-btn-wrap').style.display = ''; }
     function loadStoriesRing() {
         fetch('/api/stories/')
             .then(function(r){return r.json()})

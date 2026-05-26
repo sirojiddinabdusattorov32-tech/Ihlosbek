@@ -7,28 +7,24 @@
   </div>
   <div class="flex items-center gap-4 auth-desktop">
     {% if user.is_authenticated %}
-      <button id="chatlist-btn" class="text-gray-500 hover:text-blue-600 text-lg sm:text-xl" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;">
-        <i class="fa-solid fa-comment-sms"></i>
-      </button>
-      <button id="notif-btn" class="relative text-gray-500 hover:text-blue-600 text-lg sm:text-xl" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;">
-        <i class="fa-solid fa-bell"></i>
-        <span id="notif-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden" style="font-size:9px;line-height:1">0</span>
-      </button>
-      <div class="flex items-center gap-2">
-        {% if user.profile.avatar %}
-          <img src="{{ user.profile.avatar.url }}" class="avatar w-7 h-7 rounded-full object-cover border border-gray-200" data-username="{{ user.username }}">
-        {% else %}
-          <div class="avatar-letter w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold" data-username="{{ user.username }}">{{ user.username|first|upper }}</div>
-{% endif %}
-{% if user.is_authenticated %}
-{% include 'partials/call_global.html' %}
-{% endif %}
-        <a href="{% url 'profile' user.username %}" class="font-semibold text-gray-700 hover:text-blue-600 username-text">{{ user.username }}</a>
-        <a href="{% url 'logout' %}" class="text-red-500 hover:underline text-xs">Chiqish</a>
-      </div>
+    <button id="notif-btn" class="relative p-1.5 text-gray-500 hover:text-blue-600 transition" title="Bildirishnomalar">
+      <i class="fa-solid fa-bell"></i>
+      <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-2xs rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 font-bold hidden" style="font-size:9px;">0</span>
+    </button>
+    <button id="chatlist-btn" class="relative p-1.5 text-gray-500 hover:text-blue-600 transition" title="Xabarlar">
+      <i class="fa-solid fa-message"></i>
+    </button>
+    <a href="{% url 'profile' user.username %}" class="flex items-center gap-2 no-underline">
+      {% if user.profile.avatar %}
+      <img src="{{ user.profile.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
+      {% else %}
+      <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">{{ user.username|first|upper }}</div>
+      {% endif %}
+      <span class="text-gray-700 font-semibold text-xs sm:text-sm hover:text-blue-600">{{ user.username }}</span>
+    </a>
     {% else %}
-      <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline text-xs sm:text-sm">Ro'yxatdan o'tish</a>
-      <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:underline text-xs sm:text-sm">Kirish</a>
+    <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline text-xs sm:text-sm">Ro'yxatdan o'tish</a>
+    <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:underline text-xs sm:text-sm">Kirish</a>
     {% endif %}
   </div>
 </div>
@@ -41,23 +37,26 @@
         <a href="{% url 'home' %}" class="text-xl font-extrabold tracking-tight text-gray-900">
           avtosotuv<span class="text-blue-600">.uz</span>
         </a>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 mobile-auth-area">
           {% if user.is_authenticated %}
-            <button id="chatlist-btn-mobile" class="text-gray-500 hover:text-blue-600 text-lg" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;" onclick="document.getElementById('chatlist-btn')?.click()">
-              <i class="fa-solid fa-comment-sms"></i>
-            </button>
-            <button id="notif-btn-mobile" class="relative text-gray-500 hover:text-blue-600 text-lg" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;">
-              <i class="fa-solid fa-bell"></i>
-              <span id="notif-badge-mobile" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden" style="font-size:9px;line-height:1">0</span>
-            </button>
+          <button id="notif-btn-mobile" class="relative p-1 text-gray-500" title="Bildirishnomalar">
+            <i class="fa-solid fa-bell"></i>
+            <span id="notif-badge-mobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-2xs rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-1 font-bold hidden" style="font-size:8px;">0</span>
+          </button>
+          <button id="chatlist-btn-mobile" class="relative p-1 text-gray-500" title="Xabarlar">
+            <i class="fa-solid fa-message"></i>
+          </button>
+          <a href="{% url 'profile' user.username %}" class="flex items-center gap-1 no-underline">
             {% if user.profile.avatar %}
-              <img src="{{ user.profile.avatar.url }}" class="avatar w-7 h-7 rounded-full object-cover border border-gray-200 cursor-pointer" onclick="location.href='{% url 'profile' user.username %}'" data-username="{{ user.username }}">
+            <img src="{{ user.profile.avatar.url }}" class="w-5 h-5 rounded-full object-cover">
             {% else %}
-              <div class="avatar-letter w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold cursor-pointer" onclick="location.href='{% url 'profile' user.username %}'" data-username="{{ user.username }}">{{ user.username|first|upper }}</div>
+            <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xs font-bold">{{ user.username|first|upper }}</div>
             {% endif %}
+            <span class="text-gray-700 font-semibold text-xs">{{ user.username }}</span>
+          </a>
           {% else %}
-            <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline text-xs">Ro'yxat</a>
-            <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:underline text-xs">Kirish</a>
+          <a href="{% url 'register' %}" class="text-blue-600 font-semibold hover:underline text-xs">Ro'yxat</a>
+          <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:underline text-xs">Kirish</a>
           {% endif %}
         </div>
       </div>
@@ -116,7 +115,27 @@
 </header>
 
 {% if user.is_authenticated %}
+{% include 'partials/call_global.html' %}
 <script>
+function ajaxLogout() {
+    var fd = new FormData();
+    fd.append('csrfmiddlewaretoken', getCSRFToken());
+    fd.append('ajax', '1');
+    fetch('/logout/', {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin'
+    }).then(function(r) {
+        return r.json();
+    }).then(function(data) {
+        if (data.ok) {
+            window.location.reload();
+        }
+    }).catch(function() {
+        window.location.reload();
+    });
+}
+
 function getCSRFToken() {
   var cookies = document.cookie.split(';');
   for (var i = 0; i < cookies.length; i++) {

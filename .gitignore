@@ -4,13 +4,5 @@ __pycache__/
 media/
 staticfiles/
 db.sqlite3
-flutter_sdk.zip
 .env
 *.apk
-*.aab
-flutter_app/build/
-flutter_app/.dart_tool/
-flutter_app/.packages
-flutter_app/pubspec.lock
-flutter_app/.flutter-plugins
-flutter_app/.flutter-plugins-dependencies
