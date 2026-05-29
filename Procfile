@@ -1,1 +1,1 @@
-web: python manage.py migrate --noinput 2>&1; daphne -b 0.0.0.0 -p $PORT main.asgi:application
+web: python manage.py migrate --noinput; gunicorn main.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 120
