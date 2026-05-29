@@ -72,18 +72,11 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-import dj_database_url
-
 DATABASES = {
-    'default': dj_database_url.config(default='postgres://postgres:postgres@localhost:5432/avtosotuv_db', conn_max_age=600),
-}
-DATABASES['default']['ATOMIC_REQUESTS'] = True
-DATABASES['default']['OPTIONS'] = {
-    'connect_timeout': 10,
-    'keepalives': 1,
-    'keepalives_idle': 30,
-    'keepalives_interval': 10,
-    'keepalives_count': 5,
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 if os.environ.get('REDIS_URL'):

@@ -398,7 +398,7 @@
                                     (p.description ? '<div class="text-xs text-gray-500 mt-1">' + p.description + '</div>' : '') +
                                     '<div class="flex items-center gap-1 mt-2">' +
                                         '<span class="cursor-pointer text-sm" onclick="toggleLike(' + p.id + ', this)">' + likeIcon + '</span>' +
-                                        (p.like_count > 0 ? '<span onclick="showProductLikers(' + p.id + ')" class="text-xs text-gray-400 cursor-pointer font-semibold">' + p.like_count + '</span>' : '') +
+                                        (p.like_count > 0 ? '<span onclick="showProductLikers(' + p.id + ')" class="like-count text-xs text-gray-400 cursor-pointer font-semibold">' + p.like_count + '</span>' : '') +
                                     '</div>' +
                                 '</div>' +
                             '</div>';
