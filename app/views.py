@@ -336,34 +336,14 @@ def product_delete_view(request, pk):
     product.delete()
     return JsonResponse({'ok': True})
 
-
 @never_cache
 def home(request):
-    profile_count = 0
-    online_count = 0
-
-    now = timezone.now()
-    all_stories = Story.objects.filter(
-        expires_at__gt=now
-    ).select_related('user__profile')
-
-    story_users = set()
-    story_list = []
-
-    for s in all_stories:
-        if s.user.pk not in story_users:
-            story_users.add(s.user.pk)
-            story_list.append({
-                'user': s.user,
-                'story': s,
-            })
-
     viloyatlar = [['', "Hamma viloyatlar"]] + [[k, v] for k, v in VILOYATLAR]
 
     return render(request, 'home.html', {
-        'profile_count': profile_count,
-        'online_count': online_count,
-        'story_users': story_list,
+        'profile_count': 0,
+        'online_count': 0,
+        'story_users': [],
         'viloyatlar': json.dumps(viloyatlar),
     })
 
