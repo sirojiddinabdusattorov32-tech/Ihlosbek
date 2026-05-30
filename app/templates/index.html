@@ -17,7 +17,6 @@
     <link rel="apple-touch-icon" href="/static/icon-192.png">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=5">
     {% block extra_head %}{% endblock %}
-</head>
 <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
@@ -111,6 +110,7 @@
     }
 </style>
 {% block extra_style %}{% endblock %}
+</head>
 <body class="w-full mx-auto min-h-screen flex flex-col{% block body_class %}{% endblock %}" style="max-width:1280px;padding:0 8px;{% block body_style %}{% endblock %}">
 
 {% block redirect %}
