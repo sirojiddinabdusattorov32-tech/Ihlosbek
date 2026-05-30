@@ -40,3 +40,4 @@ ujson==5.12.1
 urllib3==2.7.0
 whitenoise==6.6.0
 zope.interface==8.4
+dj-database-url
