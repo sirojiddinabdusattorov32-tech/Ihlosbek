@@ -29,10 +29,12 @@ class Command(BaseCommand):
         if Product.objects.count() == 0:
             self._create_products()
         else:
-            updated = Product.objects.filter(color__isnull=True).update(color='Oq')
-            if updated:
-                self.stdout.write(f'Updated {updated} products with color')
-            self.stdout.write('Products already exist')
+            colors = ['Zavod', "Ko'chgan", 'Yangilangan']
+            qs = Product.objects.all().order_by('id')
+            for i, p in enumerate(qs):
+                p.color = colors[i % len(colors)]
+                p.save()
+            self.stdout.write(f'Updated {qs.count()} products with paint status')
 
     def _create_cars(self):
         try:
@@ -60,9 +62,9 @@ class Command(BaseCommand):
                 return
             resp = requests.get('https://picsum.photos/300/300', timeout=15)
             products_data = [
-                ('Chevrolet Malibu 2.0 Turbo', '28000$', 'Malibu', '50000 km', 'Oq'),
-                ('BMW X5 3.0d', '45000$', 'X5', '60000 km', 'Qora'),
-                ('Toyota Camry 70', '32000$', 'Camry', '40000 km', 'Kumush'),
+                ('Chevrolet Malibu 2.0 Turbo', '28000$', 'Malibu', '50000 km', 'Zavod'),
+                ('BMW X5 3.0d', '45000$', 'X5', '60000 km', 'Ko\'chgan'),
+                ('Toyota Camry 70', '32000$', 'Camry', '40000 km', 'Yangilangan'),
             ]
             for i, (name, price, car_model, mileage, color) in enumerate(products_data):
                 img = ContentFile(resp.content, name=f'product_{i}.jpg')
