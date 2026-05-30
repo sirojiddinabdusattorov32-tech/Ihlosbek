@@ -385,10 +385,18 @@
                     if (p.price && p.mileage) priceHtml += '<span class="text-gray-400 mx-1">|</span>';
                     if (p.mileage) priceHtml += '<span class="text-xs text-gray-500">⏱ ' + p.mileage + '</span>';
                     var region = p.user.region || '';
+                    var avatarHtml = p.user.avatar
+                        ? '<img src="' + p.user.avatar + '" class="w-7 h-7 rounded-full object-cover border-2 border-white shadow">'
+                        : '<div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow">' + (p.user.first_name || p.user.username).charAt(0).toUpperCase() + '</div>';
                     return '<div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition">' +
-                                '<a href="/chat/' + p.user.username + '/">' +
-                                    '<img src="' + p.image + '" class="w-full aspect-square object-cover" alt="' + p.name + '">' +
-                                '</a>' +
+                                '<div class="relative">' +
+                                    '<a href="/chat/' + p.user.username + '/">' +
+                                        '<img src="' + p.image + '" class="w-full aspect-square object-cover" alt="' + p.name + '">' +
+                                    '</a>' +
+                                    '<div class="absolute top-1.5 left-1.5">' +
+                                        '<a href="/profile/' + p.user.username + '/">' + avatarHtml + '</a>' +
+                                    '</div>' +
+                                '</div>' +
                                 '<div class="p-3">' +
                                     '<a href="/chat/' + p.user.username + '" class="font-semibold text-sm text-gray-900 no-underline block truncate">🚗 ' + (p.car_model || p.name) + '</a>' +
                                     '<div class="text-sm mt-1">' + priceHtml + '</div>' +
