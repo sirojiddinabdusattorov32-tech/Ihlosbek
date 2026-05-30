@@ -29,6 +29,9 @@ class Command(BaseCommand):
         if Product.objects.count() == 0:
             self._create_products()
         else:
+            updated = Product.objects.filter(color__isnull=True).update(color='Oq')
+            if updated:
+                self.stdout.write(f'Updated {updated} products with color')
             self.stdout.write('Products already exist')
 
     def _create_cars(self):
@@ -57,16 +60,16 @@ class Command(BaseCommand):
                 return
             resp = requests.get('https://picsum.photos/300/300', timeout=15)
             products_data = [
-                ('Chevrolet Malibu 2.0 Turbo', '28000$', 'Malibu', '50000 km'),
-                ('BMW X5 3.0d', '45000$', 'X5', '60000 km'),
-                ('Toyota Camry 70', '32000$', 'Camry', '40000 km'),
+                ('Chevrolet Malibu 2.0 Turbo', '28000$', 'Malibu', '50000 km', 'Oq'),
+                ('BMW X5 3.0d', '45000$', 'X5', '60000 km', 'Qora'),
+                ('Toyota Camry 70', '32000$', 'Camry', '40000 km', 'Kumush'),
             ]
-            for i, (name, price, car_model, mileage) in enumerate(products_data):
+            for i, (name, price, car_model, mileage, color) in enumerate(products_data):
                 img = ContentFile(resp.content, name=f'product_{i}.jpg')
                 Product.objects.create(
                     user=u, name=name, price=price,
                     car_model=car_model, mileage=mileage,
-                    image=img, description='A\'lo holatda'
+                    color=color, image=img, description='A\'lo holatda'
                 )
             self.stdout.write(self.style.SUCCESS(f'Created {len(products_data)} products'))
         except Exception as e:
