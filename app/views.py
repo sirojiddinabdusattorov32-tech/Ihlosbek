@@ -339,20 +339,17 @@ def product_delete_view(request, pk):
 
 @never_cache
 def home(request):
-    stats = cache.get('home_stats')
-    if not stats:
-        profile_count = Profile.objects.count()
-        online_count = Profile.objects.filter(
-            last_activity__gte=timezone.now() - timezone.timedelta(minutes=15)
-        ).count()
-        stats = {'profile_count': profile_count, 'online_count': online_count}
-        cache.set('home_stats', stats, 60)
+    profile_count = 0
+    online_count = 0
+
     now = timezone.now()
-    all_stories = Story.objects.filter(expires_at__gt=now).select_related('user__profile').only(
-        'id', 'user_id', 'expires_at'
-    ).distinct()
+    all_stories = Story.objects.filter(
+        expires_at__gt=now
+    ).select_related('user__profile')
+
     story_users = set()
     story_list = []
+
     for s in all_stories:
         if s.user.pk not in story_users:
             story_users.add(s.user.pk)
@@ -360,10 +357,12 @@ def home(request):
                 'user': s.user,
                 'story': s,
             })
+
     viloyatlar = [['', "Hamma viloyatlar"]] + [[k, v] for k, v in VILOYATLAR]
+
     return render(request, 'home.html', {
-        'profile_count': stats['profile_count'],
-        'online_count': stats['online_count'],
+        'profile_count': profile_count,
+        'online_count': online_count,
         'story_users': story_list,
         'viloyatlar': json.dumps(viloyatlar),
     })
