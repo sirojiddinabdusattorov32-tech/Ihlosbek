@@ -382,8 +382,10 @@
                     var likeIcon = p.is_liked ? '❤️' : '🤍';
                     var priceHtml = '';
                     if (p.price) priceHtml += '<span class="font-bold text-blue-600">' + p.price + '</span>';
+                    var yearHtml = p.year ? '<span class="text-xs text-gray-500">📅 ' + p.year + '</span>' : '';
                     if (p.price && p.mileage) priceHtml += '<span class="text-gray-400 mx-1">|</span>';
                     if (p.mileage) priceHtml += '<span class="text-xs text-gray-500">⏱ ' + p.mileage + '</span>';
+                    priceHtml += yearHtml;
                     var region = p.user.region || '';
                     var displayName = p.user.first_name || p.user.username;
                     var avatarHtml = p.user.avatar

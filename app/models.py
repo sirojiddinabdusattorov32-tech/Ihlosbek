@@ -98,6 +98,7 @@ class Product(models.Model):
     price = models.CharField(max_length=100, verbose_name="Narxi", blank=True, null=True)
     car_model = models.CharField(max_length=255, verbose_name="Moshina rusumi", blank=True, null=True)
     mileage = models.CharField(max_length=100, verbose_name="Probeg", blank=True, null=True)
+    year = models.IntegerField(verbose_name="Yili", blank=True, null=True)
     color = models.CharField(max_length=100, verbose_name="Kraska sepilgan", blank=True, null=True)
     description = models.TextField(verbose_name="Tavsif", blank=True, null=True)
     image = models.ImageField(upload_to='products/', verbose_name="Rasm")

@@ -29,12 +29,14 @@ class Command(BaseCommand):
         if Product.objects.count() == 0:
             self._create_products()
         else:
-            colors = ['Zavod', "Ko'chgan", 'Yangilangan']
+            years_colors = [(2022, 'Zavod'), (2021, "Ko'chgan"), (2023, 'Yangilangan')]
             qs = Product.objects.all().order_by('id')
             for i, p in enumerate(qs):
-                p.color = colors[i % len(colors)]
+                y, c = years_colors[i % len(years_colors)]
+                p.year = y
+                p.color = c
                 p.save()
-            self.stdout.write(f'Updated {qs.count()} products with paint status')
+            self.stdout.write(f'Updated {qs.count()} products with year & paint status')
 
     def _create_cars(self):
         try:
@@ -62,16 +64,16 @@ class Command(BaseCommand):
                 return
             resp = requests.get('https://picsum.photos/300/300', timeout=15)
             products_data = [
-                ('Chevrolet Malibu 2.0 Turbo', '28000$', 'Malibu', '50000 km', 'Zavod'),
-                ('BMW X5 3.0d', '45000$', 'X5', '60000 km', 'Ko\'chgan'),
-                ('Toyota Camry 70', '32000$', 'Camry', '40000 km', 'Yangilangan'),
+                ('Chevrolet Malibu 2.0 Turbo', '28000$', 'Malibu', '50000 km', 'Zavod', 2022),
+                ('BMW X5 3.0d', '45000$', 'X5', '60000 km', 'Ko\'chgan', 2021),
+                ('Toyota Camry 70', '32000$', 'Camry', '40000 km', 'Yangilangan', 2023),
             ]
-            for i, (name, price, car_model, mileage, color) in enumerate(products_data):
+            for i, (name, price, car_model, mileage, color, year) in enumerate(products_data):
                 img = ContentFile(resp.content, name=f'product_{i}.jpg')
                 Product.objects.create(
                     user=u, name=name, price=price,
                     car_model=car_model, mileage=mileage,
-                    color=color, image=img, description='A\'lo holatda'
+                    year=year, color=color, image=img, description='A\'lo holatda'
                 )
             self.stdout.write(self.style.SUCCESS(f'Created {len(products_data)} products'))
         except Exception as e:
