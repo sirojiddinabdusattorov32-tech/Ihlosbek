@@ -1,2 +1,6 @@
+[build]
+builder = "NIXPACKS"
+
 [deploy]
-startCommand = "python manage.py migrate --noinput && gunicorn main.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+startCommand = "gunicorn main.wsgi"
+restartPolicyType = "ON_FAILURE"
